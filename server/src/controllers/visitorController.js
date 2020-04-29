@@ -4,6 +4,12 @@ const fs = require('fs');
 const csv = require('csvtojson');
 
 const router = express.Router();
+const options = {
+  noheader: true,
+  headers: ['startTime', 'endTime', 'exhibit', '', 'ended'],
+  includeColumns: /(Time|exhibit|ended)/,
+  ignoreEmpty: true
+};
 
 // function cleanPresentations(presentations) {
 //   for (let i = 0; i < presentations.length; i++) {
@@ -38,23 +44,39 @@ function visitorEvents(csvLines) {
   }
   const positions = csvLines.slice(flags[0] + 1, flags[1]);
   const presentations = csvLines.slice(flags[1] + 1, flags[2]);
-
   return { positions, presentations };
+}
+
+function csv2visitorFromFile(filepath) {
+  return new Promise((resolve, reject) => {
+    csv(options).fromFile(filepath)
+      .then((jsonFile) => {
+        resolve(visitorEvents(jsonFile));
+      })
+      .catch((err) => {
+        reject(err);
+      });
+  });
+}
+
+function csv2visitorFromStr(csvStr) {
+  return new Promise((resolve, reject) => {
+    csv(options).fromString(csvStr)
+      .then((jsonFile) => {
+        resolve(visitorEvents(jsonFile));
+      })
+      .catch((err) => {
+        reject(err);
+      });
+  });
 }
 
 const getVisitor = (req, res) => {
   // const filepath = path.join(__dirname, '../files/visitors-log/visitor_195_146.csv');
   const filepath = path.join(__dirname, '../files/visitors-log/visitor_342_257.csv');
-  csv({
-    // output: 'csv',
-    noheader: true,
-    headers: ['startTime', 'endTime', 'exhibit', '', 'ended'],
-    includeColumns: /(Time|exhibit|ended)/,
-    ignoreEmpty: true
-  }).fromFile(filepath)
-    .then((jsonFile) => {
-      res.json(visitorEvents(jsonFile));
-      // res.json(visitorEventsFromCsv(csvLines));
+  csv2visitorFromFile(filepath)
+    .then((value) => {
+      res.json(value);
     })
     .catch((err) => {
       console.error(err);
