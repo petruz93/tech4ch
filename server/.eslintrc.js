@@ -20,6 +20,7 @@ module.exports = {
   rules: {
     'no-console': 'off',
     'no-unused-vars': ['warn'],
-    'comma-dangle': ['error', 'never']
+    'comma-dangle': ['error', 'never'],
+    'no-plusplus': 'off'
   }
 };
