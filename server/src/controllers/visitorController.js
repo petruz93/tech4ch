@@ -1,5 +1,6 @@
 const express = require('express');
 const path = require('path');
+const fs = require('fs');
 const csv = require('csvtojson');
 
 const router = express.Router();
@@ -42,20 +43,68 @@ function visitorEvents(csvLines) {
 }
 
 const getVisitor = (req, res) => {
-  const pathfile = path.join(__dirname, '../files/visitors-log/visitor_195_146.csv');
+  // const filepath = path.join(__dirname, '../files/visitors-log/visitor_195_146.csv');
+  const filepath = path.join(__dirname, '../files/visitors-log/visitor_342_257.csv');
   csv({
     // output: 'csv',
     noheader: true,
     headers: ['startTime', 'endTime', 'exhibit', '', 'ended'],
     includeColumns: /(Time|exhibit|ended)/,
     ignoreEmpty: true
-  }).fromFile(pathfile)
+  }).fromFile(filepath)
     .then((jsonFile) => {
       res.json(visitorEvents(jsonFile));
       // res.json(visitorEventsFromCsv(csvLines));
     })
     .catch((err) => {
       console.error(err);
+    });
+};
+
+// Make Promise version of fs.readdir()
+fs.readdirAsync = (dirname) => {
+  return new Promise((resolve, reject) => {
+    fs.readdir(dirname, (err, filenames) => {
+      if (err) {
+        reject(err);
+      } else {
+        resolve(filenames);
+      }
+    });
+  });
+};
+
+// Make Promise version of fs.readFile()
+fs.readFileAsync = (filename, enc) => {
+  return new Promise((resolve, reject) => {
+    fs.readFile(filename, enc, (err, data) => {
+      if (err) {
+        reject(err);
+      } else {
+        resolve(data);
+      }
+    });
+  });
+};
+
+// Utility function, return Promise
+function getFile(filename) {
+  return fs.readFileAsync(filename, 'utf8');
+}
+
+/**
+ * Read all json files in the directory, and using Promise.all
+ * to time when all async readFiles has completed.
+ */
+const getAllVisitors = (req, res) => {
+  const dirpath = path.join(__dirname, '../files/visitors-log');
+  fs.readdirAsync(dirpath)
+    .then((filenames) => {
+      console.log(filenames);
+      return Promise.all(filenames.map(getFile));
+    })
+    .then((files) => {
+
     });
 };
 

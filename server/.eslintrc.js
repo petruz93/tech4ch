@@ -21,6 +21,7 @@ module.exports = {
     'no-console': 'off',
     'no-unused-vars': ['warn'],
     'comma-dangle': ['error', 'never'],
-    'no-plusplus': 'off'
+    'no-plusplus': 'off',
+    'arrow-body-style': 'off'
   }
 };
