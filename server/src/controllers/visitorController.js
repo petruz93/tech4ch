@@ -66,21 +66,18 @@ function readCsvAsync(filepath) {
  * Read all csv files in the directory, and using Promise.all
  * to time when all async readFiles has completed.
  */
-const getAllVisitors = (req, res) => {
+const getAllVisitors = async (req, res) => {
   const dirpath = path.join(__dirname, '../files/visitors-log/');
-  readdirAsync(dirpath)
-    .then((filenames) => {
-      const fullFilenames = filenames.map((file) => dirpath + file);
-      console.log(fullFilenames);
-      return Promise.all(fullFilenames.map(readCsvAsync));
-    })
-    .then((files) => {
-      console.log('Finito!!!');
-      res.json(files);
-    })
-    .catch((err) => {
-      console.error(err);
-    });
+  try {
+    const filenames = await readdirAsync(dirpath);
+    const fullFilenames = filenames.map((file) => dirpath + file);
+    console.log(fullFilenames);
+    const files = await Promise.all(fullFilenames.map(readCsvAsync));
+    console.log('Finito!!!');
+    res.json(files);
+  } catch (err) {
+    console.error(err);
+  }
 };
 
 router.get('/visitors', getVisitor);
