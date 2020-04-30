@@ -119,17 +119,23 @@ function getFile(filename) {
  * to time when all async readFiles has completed.
  */
 const getAllVisitors = (req, res) => {
-  const dirpath = path.join(__dirname, '../files/visitors-log');
+  const dirpath = path.join(__dirname, '../files/visitors-log/');
   fs.readdirAsync(dirpath)
     .then((filenames) => {
-      console.log(filenames);
-      return Promise.all(filenames.map(getFile));
+      const fullFilenames = filenames.map((file) => dirpath + file);
+      console.log(fullFilenames);
+      return Promise.all(fullFilenames.map(getFile));
     })
     .then((files) => {
-
+      console.log('Finito!!!');
+      res.json(files);
+    })
+    .catch((err) => {
+      console.error(err);
     });
 };
 
 router.get('/visitors', getVisitor);
+router.get('/visitors/all', getAllVisitors);
 
 module.exports = router;
