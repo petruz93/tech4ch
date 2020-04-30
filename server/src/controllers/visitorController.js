@@ -34,7 +34,6 @@ function csv2visitor(filepath) {
 }
 
 const getVisitor = (req, res) => {
-  // const filepath = path.join(__dirname, '../files/visitors-log/visitor_195_146.csv');
   const filepath = path.join(__dirname, '../files/visitors-log/visitor_342_257.csv');
   csv2visitor(filepath)
     .then((value) => res.json(value))
@@ -63,9 +62,7 @@ const getAllVisitors = async (req, res) => {
   try {
     const filenames = await readdirAsync(dirpath);
     const fullFilenames = filenames.map((file) => dirpath + file);
-    console.log(fullFilenames);
     const files = await Promise.all(fullFilenames.map(csv2visitor));
-    console.log('Finito!!!');
     const jsonVisitors = [];
     for (let i = 0; i < files.length; i++) {
       jsonVisitors.push({
