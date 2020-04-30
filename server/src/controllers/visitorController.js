@@ -54,14 +54,6 @@ function readdirAsync(dirname) {
   });
 }
 
-function readCsvAsync(filepath) {
-  return new Promise((resolve, reject) => {
-    csv2visitor(filepath)
-      .then((value) => resolve(value))
-      .catch((reason) => reject(reason));
-  });
-}
-
 /**
  * Read all csv files in the directory, and using Promise.all
  * to time when all async readFiles has completed.
@@ -72,9 +64,18 @@ const getAllVisitors = async (req, res) => {
     const filenames = await readdirAsync(dirpath);
     const fullFilenames = filenames.map((file) => dirpath + file);
     console.log(fullFilenames);
-    const files = await Promise.all(fullFilenames.map(readCsvAsync));
+    const files = await Promise.all(fullFilenames.map(csv2visitor));
     console.log('Finito!!!');
-    res.json(files);
+    const jsonVisitors = [];
+    for (let i = 0; i < files.length; i++) {
+      jsonVisitors.push({
+        visitorID: filenames[i].slice(8, 11),
+        groupID: filenames[i].slice(12, 15),
+        positions: files[i].positions,
+        presentations: files[i].presentations
+      });
+    }
+    res.json(jsonVisitors);
   } catch (err) {
     console.error(err);
   }
