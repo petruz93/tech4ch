@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <title>animate demo</title>
+    <style>
+        .block_1 {
+            border: 1px solid red;
+            position: absolute;
+            left: 940px;
+            top: 520px;
+            width: 30px;
+            height: 30px;
+            margin: 5px;
+        }
+
+        .block_2 {
+            border: 1px solid blue;
+            position: absolute;
+            left: 940px;
+            top: 555px;
+            width: 30px;
+            height: 30px;
+            margin: 5px;
+        }
+
+        .block_b {
+            position: absolute;
+            background-color: red;
+            left: 600px;
+            top: 600px;
+            width: 90px;
+            height: 90px;
+            margin: 5px;
+            border-radius: 50%;
+        }
+    </style>
+    <!--    <script src="https://code.jquery.com/jquery-3.4.1.js"></script>-->
+    <!-- <script src="https://code.jquery.com/jquery-3.5.0.js"></script> -->
+    <script>
+        import $ from 'jquery'
+    </script>
+</head>
+
+<body>
+    <!-- <div id="map"></div> -->
+
+    <button id="play">&#9658;</button>
+    <button id="replay">&#10227;</button>
+    <input type="radio" id="slow" name="animation_speed" value="slow">
+    <label for="slow">Slow</label>
+    <input type="radio" id="fast" name="animation_speed" value="fast">
+    <label for="fast">Fast</label>
+
+    <img src="human.png" class="block_1" id="w1">
+    <img src="human.png" class="block_2" id="w2">
+    <br>
+    <img src="Clean%20Map.jpg" class="bkg_img">
+
+    <script>
+        $('#play').click(function () {
+          console.log("Prova")
+        })
+    </script>
+
+    <!-- <script>
+        // var txt = "OldMessage";
+        // async function aa() {
+        //     await $.ajax({
+        //         url: 'http://localhost:8081/hello/'
+        //     }).done(data => {
+        //         this.txt = data.message;
+        //     });
+        //     console.log(txt);
+        // }
+        // aa();
+
+        var w = ["w1", "w2"];
+
+        var slow_animate_speed = [1000, 3000];
+        var fast_animate_speed = [500, 800];
+        var current_animate_speed = slow_animate_speed
+
+
+        // set slow speed on load
+        function set_slow_speed() {
+            document.getElementById("slow").checked = true;
+        }
+
+        window.onload = set_slow_speed();
+
+        // replay button
+        $("#replay").click(function () {
+            location.reload();
+        });
+
+        // radio button
+        var radios = document.querySelectorAll('input[type=radio][name="animation_speed"]');
+
+        function changeHandler(event) {
+            if (this.value === 'fast') {
+                current_animate_speed = fast_animate_speed;
+            } else if (this.value === 'slow') {
+                current_animate_speed = slow_animate_speed;
+            }
+        }
+
+        Array.prototype.forEach.call(radios, function (radio) {
+            radio.addEventListener('change', changeHandler);
+        });
+
+
+    </script> -->
+
+</body>
+
+</html>
