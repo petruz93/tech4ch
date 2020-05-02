@@ -1,6 +1,7 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
 import Home from '../views/Home.vue'
+import AttractionPower from '../views/AttractionPower.vue'
 
 Vue.use(VueRouter)
 
@@ -9,6 +10,16 @@ const routes = [
     path: '/',
     name: 'Home',
     component: Home
+  },
+  {
+    path: '/',
+    name: 'Home',
+    component: Home
+  },
+  {
+    path: '/attr_power',
+    name: 'AttractionPower',
+    component: AttractionPower
   },
   {
     path: '/about',

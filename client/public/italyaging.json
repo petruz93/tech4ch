@@ -1,0 +1,26 @@
+[
+  {
+      "year": "1950",
+      "ageGroups": [
+        { "ageGroup": "0-4", "population": 4369 },
+        { "ageGroup": "5-9", "population": 3839 },
+        { "ageGroup": "10-14", "population": 4170 }
+      ]
+    },
+    {
+      "year": "1960",
+      "ageGroups": [
+        { "ageGroup": "0-4", "population": 4169 },
+        { "ageGroup": "5-9", "population": 3959 },
+        { "ageGroup": "10-14", "population": 4580 }
+      ]
+    },
+    {
+      "year": "1970",
+      "ageGroups": [
+        { "ageGroup": "0-4", "population": 4569 },
+        { "ageGroup": "5-9", "population": 3539 },
+        { "ageGroup": "10-14", "population": 4670 }
+      ]
+    }
+]

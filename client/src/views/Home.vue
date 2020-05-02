@@ -1,6 +1,9 @@
 <template>
   <div class="home">
     <HelloWorld msg="Welcome to Tech4CH App"/>
+  <!-- <img src="@/assets/museum_clean_map.jpg" width=135%, height=135% /> -->
+  <!-- <BarChart :barChartData = loadDataBarChart /> -->
+  <BubbleChart :dataset = loadDataBubbleChart />
   </div>
 </template>
 
@@ -15,3 +18,7 @@ export default {
   }
 }
 </script>
+
+<style scoped>
+
+</style>
