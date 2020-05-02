@@ -5,16 +5,16 @@ const csv = require('csvtojson');
 
 const router = express.Router();
 
-const getVisits = (req, res) => {
+const getVisits = (req, res, next) => {
   const pathfile = path.join(__dirname, '../files/visitors_grouping.csv');
   csv({
-    headers: ['visitorId', 'group', 'groupSize', 'date', 'startTime', 'endTime', 'blind', 'headphones', '', 'note', '', 'defect'],
-    includeColumns: /(visitorId|group$|date|start|end)/
+    headers: ['visitorID', 'groupID', 'groupSize', 'date', 'startTime', 'endTime', 'blind', 'headphones', '', 'note', '', 'defect'],
+    includeColumns: /(visitorID|groupID|date|start|end)/
   }).fromFile(pathfile)
     .then((jsonObj) => {
       res.json(jsonObj);
     }).catch((err) => {
-      console.error(err);
+      next(err);
     });
 };
 

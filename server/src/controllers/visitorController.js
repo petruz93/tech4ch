@@ -33,11 +33,11 @@ function csv2visitor(filepath) {
   });
 }
 
-const getVisitor = (req, res) => {
+const getVisitor = (req, res, next) => {
   const filepath = path.join(__dirname, '../files/visitors-log/visitor_342_257.csv');
   csv2visitor(filepath)
     .then((value) => res.json(value))
-    .catch((err) => console.error(err));
+    .catch((err) => next(err));
 };
 
 // Make Promise version of fs.readdir()
@@ -57,7 +57,7 @@ function readdirAsync(dirname) {
  * Read all csv files in the directory, and using Promise.all
  * to time when all async readFiles has completed.
  */
-const getAllVisitors = async (req, res) => {
+const getAllVisitors = async (req, res, next) => {
   const dirpath = path.join(__dirname, '../files/visitors-log/');
   try {
     const filenames = await readdirAsync(dirpath);
@@ -74,7 +74,7 @@ const getAllVisitors = async (req, res) => {
     }
     res.json(jsonVisitors);
   } catch (err) {
-    console.error(err);
+    next(err);
   }
 };
 
