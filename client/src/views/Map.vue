@@ -7,15 +7,21 @@
     <label for='slow'>Slow</label>
     <input type='radio' id='fast' name='animation_speed' value='fast' onclick='changeSpeed(id)' />
     <label for='fast'>Fast</label>
-    <img v-for='visitor in post.visitors' :key='visitor' :class="'block_'+visitor" src='human.png' :id='visitor' />
+    <img v-for='visitor in post.visitors' :key='visitor' src='human.png' :id='visitor' style='border: 1px solid red;
+      position: absolute;
+      width: 30px;
+      height: 30px;
+      margin: 5px;
+      visibility: hidden;'/>
     <input type='hidden' :value='post.visit' name='visit' />
+    <input type='hidden' :value='post.visitors' name='visitors' />
     <br />
     <img src='Clean%20Map.jpg' class='bkg_img' />
   </div>
 </template>
 
 <style scoped>
-/* Metti qua i css delle immaginine */
+
 </style>
 
 <script>
@@ -25,8 +31,7 @@ export default {
   data () {
     return {
       post: [],
-      error: '',
-      text: ''
+      error: ''
     }
   },
   async created () {

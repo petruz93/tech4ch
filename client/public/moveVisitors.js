@@ -13,7 +13,7 @@ function getBkgImagePosition() {
 // Fix the coordinate of the POI, the background image isn't in (0,0)
 function fixPosition(wrongPosition) {
   var bkgPosition = getBkgImagePosition()
-  var width = $('.block_w1').css('width')
+  var width = $('#w1').css('width')
   width = +width.substring(0, width.length-2) / +2
   var fixedPosition = wrongPosition
   fixedPosition.top = +fixedPosition.top + +bkgPosition.top + -width
@@ -25,6 +25,14 @@ function fixPosition(wrongPosition) {
 function getVisit() {
   var visit = $( 'input[name=\'visit\']' ).attr('value')
   console.log(visit)
+  return visit
+}
+
+// Retrieve the visitors class name from a tag in the HTML page
+function getVisitors() {
+  var visit = $( 'input[name=\'visitors\']' ).attr('value')
+  visit = visit.split(',')
+  // console.log(visit)
   return visit
 }
 
@@ -40,16 +48,20 @@ async function moveVisitors () {
   var matPosition = {'top': 510, 'left': 940}
   var fixedMatPosition = fixPosition(matPosition)
   // TODO: Rendi tutto dinamico
-  $('.block_w1').css('top', fixedMatPosition.top)
-  $('.block_w1').css('left', fixedMatPosition.left)
-  $('.block_w2').css('top', fixedMatPosition.top)
-  $('.block_w2').css('left', fixedMatPosition.left + 35)
-  $('.block_w1').css('visibility', 'visible')
-  $('.block_w2').css('visibility', 'visible')
+  var visitors = getVisitors()
+  var x_traslated = 0
+  for (const element in visitors) {
+    console.log(visitors[element])
+    $('#'+visitors[element]).css('top', fixedMatPosition.top)
+    $('#'+visitors[element]).css('left', +fixedMatPosition.left + +x_traslated*35)
+    $('#'+visitors[element]).css('visibility', 'visible')
+    x_traslated = x_traslated + 1
+  }
+  await sleep(1000)
   $('#play').hide()
-  var visitor = JSON.parse(getVisit())
-  console.log(typeof(visitor))
-  for (const element of visitor) {
+  var visit = JSON.parse(getVisit())
+  console.log(typeof(visit))
+  for (const element of visit) {
     console.log(element)
     console.log('----')
     var id = '#' + element[3]
