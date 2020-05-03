@@ -1,7 +1,9 @@
 <template>
   <div class="home">
-  <BubbleChart msg="Bubble chart showing exihibit attraction power"
-    :dataset = loadDataBubbleChart />
+  <BubbleChart
+    :exhibitData = "loadExhibitData"
+    :visitorData = "loadVisitorTest"
+    />
   </div>
 </template>
 
@@ -17,7 +19,8 @@ export default {
   },
   data () {
     return {
-      loadDataBubbleChart: {}
+      loadExhibitData: {},
+      loadVisitorTest: {}
     }
   },
   mounted () {
@@ -26,8 +29,10 @@ export default {
   },
   methods: {
     async fetchData () {
-      const dataBubbleChart = await d3.json('./dataset.json')
-      this.loadDataBubbleChart = dataBubbleChart
+      const exhibitDataTemp = await d3.json('./map-data.json')
+      this.loadExhibitData = exhibitDataTemp
+      const visitorDataTemp = await d3.json('./visitorsTest.json')
+      this.loadVisitorTest = visitorDataTemp
     }
   }
 }
