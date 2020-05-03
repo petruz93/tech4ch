@@ -2,14 +2,9 @@ const express = require('express');
 const path = require('path');
 const fs = require('fs');
 const csv = require('csvtojson');
+const mapData = require('../files/map-data');
 
 const router = express.Router();
-const options = {
-  noheader: true,
-  headers: ['startTime', 'endTime', 'exhibit', '', 'ended'],
-  includeColumns: /(Time|exhibit|ended)/,
-  ignoreEmpty: true
-};
 
 function visitorEvents(csvLines) {
   const flags = [];
@@ -27,7 +22,12 @@ function visitorEvents(csvLines) {
 
 function csv2visitor(filepath) {
   return new Promise((resolve, reject) => {
-    csv(options).fromFile(filepath)
+    csv({
+      noheader: true,
+      headers: ['startTime', 'endTime', 'exhibit', '', 'ended'],
+      includeColumns: /(Time|exhibit|ended)/,
+      ignoreEmpty: true
+    }).fromFile(filepath)
       .then((jsonFile) => resolve(visitorEvents(jsonFile)))
       .catch((err) => reject(err));
   });
@@ -57,11 +57,10 @@ function readdirAsync(dirname) {
  * Read all csv files in the directory, and using Promise.all
  * to time when all async readFiles has completed.
  */
-const getAllVisitors = async (req, res, next) => {
-  const dirpath = path.join(__dirname, '../files/visitors-log/');
+async function readAllVisitorsFromDir(dirname) {
   try {
-    const filenames = await readdirAsync(dirpath);
-    const fullFilenames = filenames.map((file) => dirpath + file);
+    const filenames = await readdirAsync(dirname);
+    const fullFilenames = filenames.map((file) => dirname + file);
     const files = await Promise.all(fullFilenames.map(csv2visitor));
     const jsonVisitors = [];
     for (let i = 0; i < files.length; i++) {
@@ -72,7 +71,27 @@ const getAllVisitors = async (req, res, next) => {
         presentations: files[i].presentations
       });
     }
-    res.json(jsonVisitors);
+    return jsonVisitors;
+  } catch (err) {
+    throw new Error(err.message);
+  }
+}
+
+const getAllVisitors = async (req, res, next) => {
+  const dirpath = path.join(__dirname, '../files/visitors-log/');
+  try {
+    const visitorsData = await readAllVisitorsFromDir(dirpath);
+    res.json(visitorsData);
+  } catch (err) {
+    next(err);
+  }
+};
+
+const getAllVisitorsAndMap = async (req, res, next) => {
+  const dirpath = path.join(__dirname, '../files/visitors-log/');
+  try {
+    const visitorsData = await readAllVisitorsFromDir(dirpath);
+    res.json({ visitorsData, mapData });
   } catch (err) {
     next(err);
   }
@@ -80,5 +99,6 @@ const getAllVisitors = async (req, res, next) => {
 
 router.get('/visitors', getVisitor);
 router.get('/visitors/all', getAllVisitors);
+router.get('/alldata', getAllVisitorsAndMap);
 
 module.exports = router;
