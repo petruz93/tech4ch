@@ -1,86 +1,21 @@
 const express = require('express');
 const path = require('path');
-const fs = require('fs');
-const csv = require('csvtojson');
+const parser = require('../utility/csvParser');
 const mapData = require('../files/map-data');
 
 const router = express.Router();
 
-function visitorEvents(csvLines) {
-  const flags = [];
-  for (let i = 0; i < csvLines.length; i++) {
-    if (csvLines[i].startTime === 'Positions'
-    || csvLines[i].startTime === 'presentations'
-    || csvLines[i].startTime === 'events') {
-      flags.push(i);
-    }
-  }
-  const positions = csvLines.slice(flags[0] + 1, flags[1]);
-  const presentations = csvLines.slice(flags[1] + 1, flags[2]);
-  return { positions, presentations };
-}
-
-function csv2visitor(filepath) {
-  return new Promise((resolve, reject) => {
-    csv({
-      noheader: true,
-      headers: ['startTime', 'endTime', 'exhibit', '', 'ended'],
-      includeColumns: /(Time|exhibit|ended)/,
-      ignoreEmpty: true
-    }).fromFile(filepath)
-      .then((jsonFile) => resolve(visitorEvents(jsonFile)))
-      .catch((err) => reject(err));
-  });
-}
-
 const getVisitor = (req, res, next) => {
   const filepath = path.join(__dirname, '../files/visitors-log/visitor_342_257.csv');
-  csv2visitor(filepath)
+  parser.csv2visitor(filepath)
     .then((value) => res.json(value))
     .catch((err) => next(err));
 };
 
-// Make Promise version of fs.readdir()
-function readdirAsync(dirname) {
-  return new Promise((resolve, reject) => {
-    fs.readdir(dirname, (err, filenames) => {
-      if (err) {
-        reject(err);
-      } else {
-        resolve(filenames);
-      }
-    });
-  });
-}
-
-/**
- * Read all csv files in the directory, and using Promise.all
- * to time when all async readFiles has completed.
- */
-async function readAllVisitorsFromDir(dirname) {
-  try {
-    const filenames = await readdirAsync(dirname);
-    const fullFilenames = filenames.map((file) => dirname + file);
-    const files = await Promise.all(fullFilenames.map(csv2visitor));
-    const jsonVisitors = [];
-    for (let i = 0; i < files.length; i++) {
-      jsonVisitors.push({
-        visitorID: filenames[i].slice(8, 11),
-        groupID: filenames[i].slice(12, 15),
-        positions: files[i].positions,
-        presentations: files[i].presentations
-      });
-    }
-    return jsonVisitors;
-  } catch (err) {
-    throw new Error(err.message);
-  }
-}
-
 const getAllVisitors = async (req, res, next) => {
   const dirpath = path.join(__dirname, '../files/visitors-log/');
   try {
-    const visitorsData = await readAllVisitorsFromDir(dirpath);
+    const visitorsData = await parser.readAllVisitorsFromDir(dirpath);
     res.json(visitorsData);
   } catch (err) {
     next(err);
@@ -90,14 +25,14 @@ const getAllVisitors = async (req, res, next) => {
 const getAllVisitorsAndMap = async (req, res, next) => {
   const dirpath = path.join(__dirname, '../files/visitors-log/');
   try {
-    const visitorsData = await readAllVisitorsFromDir(dirpath);
+    const visitorsData = await parser.readAllVisitorsFromDir(dirpath);
     res.json({ visitorsData, mapData });
   } catch (err) {
     next(err);
   }
 };
 
-router.get('/visitors', getVisitor);
+router.get('/visitors/test', getVisitor);
 router.get('/visitors/all', getAllVisitors);
 router.get('/alldata', getAllVisitorsAndMap);
 
