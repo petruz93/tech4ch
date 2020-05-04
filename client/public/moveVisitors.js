@@ -1,4 +1,4 @@
-// The first value is the speed of the animation 
+// The first value is the speed of the animation
 // while the second is the sleep time between the beginning of an animation and the next
 var slowAnimateSpeed = [1000, 3000]
 var fastAnimateSpeed = [500, 500]
@@ -11,12 +11,18 @@ function getBkgImagePosition() {
 }
 
 // Fix the coordinate of the POI, the background image isn't in (0,0)
-function fixPosition(wrongPosition) {
+function fixPosition(wrongPosition, matPosition=true) {
   var bkgPosition = getBkgImagePosition()
   var width = $('#w1').css('width')
   width = +width.substring(0, width.length-2) / +2
-  var fixedPosition = wrongPosition
+  const fixedPosition = wrongPosition;
+  if (!matPosition) {
+    fixedPosition.top = +fixedPosition.top + +fixedPosition.top*0.35
+  }
   fixedPosition.top = +fixedPosition.top + +bkgPosition.top + -width
+  if (!matPosition) {
+    fixedPosition.left = +fixedPosition.left  + +fixedPosition.left*0.35
+  }
   fixedPosition.left = +fixedPosition.left + +bkgPosition.left + -width
   return fixedPosition
 }
@@ -47,7 +53,6 @@ function sleep (ms) {
 async function moveVisitors () {
   var matPosition = {'top': 510, 'left': 940}
   var fixedMatPosition = fixPosition(matPosition)
-  // TODO: Rendi tutto dinamico
   var visitors = getVisitors()
   var x_traslated = 0
   for (const element in visitors) {
@@ -65,11 +70,12 @@ async function moveVisitors () {
     console.log(element)
     console.log('----')
     var id = '#' + element[3]
-    var custom_position = fixPosition({'top': element[2], 'left': element[1]})
+    var custom_position = fixPosition({'top': element[2], 'left': element[1]}, false)
     // for (const person of w) {
 
     // }
     $(id).animate(custom_position, currentAnimateSpeed[0])
+    $('#timestamp').text(element[0])
     await sleep(currentAnimateSpeed[1])
   }
 }

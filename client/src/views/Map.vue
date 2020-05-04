@@ -3,7 +3,7 @@
     <p class='error' v-if='error'>{{ error }}</p>
     <button id='play' onclick='moveVisitors()'>&#9658;</button>
     <button id='replay' onclick='replay()'>&#10227;</button>
-    <input type='radio' id='slow' name='animation_speed' value='slow' onclick='changeSpeed(id)' checked />
+    <input type='radio' id='slow' name='animation_speed' value='slow' onclick='changeSpeed(id)' />
     <label for='slow'>Slow</label>
     <input type='radio' id='fast' name='animation_speed' value='fast' onclick='changeSpeed(id)' />
     <label for='fast'>Fast</label>
@@ -12,17 +12,14 @@
       width: 30px;
       height: 30px;
       margin: 5px;
-      visibility: hidden;'/>
+      visibility: hidden;' alt='Visitor' />
     <input type='hidden' :value='post.visit' name='visit' />
     <input type='hidden' :value='post.visitors' name='visitors' />
     <br />
-    <img src='Clean%20Map.jpg' class='bkg_img' />
+    <img src='Clean%20Map.jpg' class='bkg_img'  alt='Map' />
+    <p id='timestamp'></p>
   </div>
 </template>
-
-<style scoped>
-
-</style>
 
 <script>
 import GroupService from '../GroupService.js'
