@@ -7,8 +7,7 @@
     <label for='slow'>Slow</label>
     <input type='radio' id='fast' name='animation_speed' value='fast' onclick='changeSpeed(id)' />
     <label for='fast'>Fast</label>
-    <img v-for='visitor in post.visitors' :key='visitor' src='human.png' :id='visitor' style='border: 1px solid red;
-      position: absolute;
+    <img v-for='visitor in post.visitors' :key='visitor' src='human.png' :id='visitor' style='position: absolute;
       width: 30px;
       height: 30px;
       margin: 5px;
