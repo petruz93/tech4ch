@@ -12,11 +12,6 @@ const routes = [
     component: Home
   },
   {
-    path: '/',
-    name: 'Home',
-    component: Home
-  },
-  {
     path: '/attr_power',
     name: 'AttractionPower',
     component: AttractionPower

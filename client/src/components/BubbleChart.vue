@@ -2,12 +2,27 @@
   <div>
     <h1>Bubble Chart</h1>
     <p align="center">
-      <svg :style="{
-        backgroundImage: `url(${museumMap})`
+      <svg
+        :width="width"
+        :height="height"
+        :style="{
+          backgroundImage: `url(${museumMap})`
         }">
+        <g>
+          <circle
+            v-for="(item, index) in exhibitData"
+            :key="index"
+            :cx="x"
+            :cy="y"
+            :r="r"
+            fill="red"
+            stroke.width="100"
+            stroke="50"
+            @click="onClick()"
+            />
+        </g>
       </svg>
     </p>
-    {{ renderChart }}
   </div>
 </template>
 
@@ -18,11 +33,15 @@ import museumMap from '@/assets/museum_clean_map.jpg'
 export default {
   name: 'BubbleChart',
   props: {
-    exhibitData: {
-      type: Array
+    exhibitDataProp: {
+      type: Array[Object],
+      required: true,
+      default: { name: 'che divertimento!' }
     },
-    visitorData: {
-      type: Array
+    visitorDataProp: {
+      type: Array[Object],
+      required: true,
+      default: { name: 'ma popo troppo' }
     }
   },
   data () {
@@ -31,64 +50,38 @@ export default {
       msg: 'Here is the BubbleChart',
       width: 1149,
       height: 560,
-      museumMap
+      museumMap,
+      exhibitData: this.exhibitDataProp,
+      visitorData: this.visitorDataProp
     }
+  },
+  mounted () {
+    console.log('BubbleChart loaded')
+    // this.fetchData()
+    this.renderChart()
   },
   methods: {
     onClick () {
       console.log('hey there')
     },
-    exhibitVisits (name) {
-      let count = 0
-      // if (!this.visitorData.results) return 'no data'
-      // if (!Array.isArray(this.visitorData.results)) return 'results are not array'
-      console.log(this.visitorData)
-      this.visitorData.forEach(visitor => {
-        visitor.positions.forEach(pos => {
-          if (pos.exhibit === name) count++
-        })
-      })
-      return count
-    },
-    calculateAttractionPower () {
-      const exhibitDataLength = this.exhibitData.length
-      console.log(this.exhibitVisits('EntranceReubenHecht'))
-      return this.exhibitData.map(element => this.exhibitVisits(element.name) / exhibitDataLength)
-    }
-  },
-  computed: {
-    // buildAxis () {
-    //   const x = d3
-    //     .scaleLinear()
-    //     .domain([0, 100])
-    //     .range([0, 1149])
-    //   const y = d3
-    //     .scaleLinear()
-    //     .domain([0, 100])
-    //     .range([0, 1149])
-    //   const output = d3
-    //     .select('svg')
-    //     .append('g')
-    //     .attr('transform', 'translate(50,50)')
-    //     .call(d3.axisBottom(x))
-    //     .call(d3.axisLeft(y))
-    //   return output
+    // async fetchData () {
+    //   const exhibitDataTemp = await d3.json('@/map-data.json')
+    //   console.log('exhibitDataTemp', exhibitDataTemp)
+    //   this.exhibitData = exhibitDataTemp
+    //   const visitorDataTemp = await d3.json('@/visitorsTest.json')
+    //   this.visitorData = visitorDataTemp
     // },
-    attractionPower () {
-      return this.calculateAttractionPower()
-    },
     renderChart () {
+      console.log()
       const r = d3
         .scaleLinear()
-        .domain([0, Math.max(this.attractionPower)])
+        .domain([0, Math.max(...this.calculateAttractionPower())])
         .range([0, 100])
       const svg = d3.select('svg')
         .attr('width', this.width)
         .attr('height', this.height)
         .style('background-image', `url(${this.museumMap})`)
       const output = svg
-        // .append('img')
-        // .attr('src', '@/assets/museum_clean_map.jpg')
         .selectAll('circle')
         .data(this.exhibitData)
         .enter()
@@ -101,11 +94,40 @@ export default {
         .attr('stroke', 50)
         .on('click', this.onClick)
       return output
+    }
+  },
+  computed: {
+    prepareVisitorData () {
+      const visitorDataSet = d3
+        .entries(this.visitorData)
+      const allVisitors = { id: 'visitorData', values: visitorDataSet }
+      return allVisitors
     },
-    packData () {
-      const dataSet = d3
+    prepareExhibitData () {
+      const exhibitDataSet = d3
         .entries(this.exhibitData)
-      return dataSet
+      const allExihibits = { id: 'exhibitData', values: exhibitDataSet }
+      return allExihibits
+    },
+    exhibitVisits (name) {
+      console.log('exhibitData', this.prepareExhibitData().length)
+      console.log('visitData', this.prepareVisitorData())
+      // console.log('visitDataPositions', this.visitorData[0].positions[1])
+      // console.log('visitDataExihibit', this.visitorData.positions.exhibit)
+      const visits = this.prepareVisitorData()
+        .map(visitor =>
+          visitor.positions.forEach(pos =>
+            pos.exhibit === name ? 1 : 0)
+            .reduce((count, exhibit) =>
+              count + exhibit
+            ))
+      console.log('visits:', visits.results)
+      return visits
+    },
+    calculateAttractionPower () {
+      const visitorDataLength = this.visitorData.length
+      console.log(this.exhibitVisits('EntranceReubenHecht'))
+      return this.prepareExhibitData().map(element => this.exhibitVisits(element.name) / visitorDataLength)
     }
   }
 }

@@ -1,9 +1,9 @@
 <template>
-  <div class="home">
-  <BubbleChart
-    :exhibitData = "loadExhibitData"
-    :visitorData = "loadVisitorTest"
-    />
+  <div>
+    <BubbleChart
+      v-if="!undefined"
+      :exhibitDataProp=loadExhibitData
+      :visitorDataProp=loadVisitorData />
   </div>
 </template>
 
@@ -19,8 +19,8 @@ export default {
   },
   data () {
     return {
-      loadExhibitData: {},
-      loadVisitorTest: {}
+      loadExhibitData: [],
+      loadVisitorData: []
     }
   },
   mounted () {
@@ -32,7 +32,7 @@ export default {
       const exhibitDataTemp = await d3.json('./map-data.json')
       this.loadExhibitData = exhibitDataTemp
       const visitorDataTemp = await d3.json('./visitorsTest.json')
-      this.loadVisitorTest = visitorDataTemp
+      this.loadVisitorData = visitorDataTemp
     }
   }
 }
