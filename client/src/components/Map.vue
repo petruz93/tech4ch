@@ -12,13 +12,9 @@
       height: 30px;
       margin: 5px;
       visibility: hidden;' alt='Visitor' />
-<!--    <input type='hidden' :value='post.visit' name='visit' />-->
-<!--    <p id='visit' style='display:none'>{{ post.visit }}</p>-->
-<!--    <input type='hidden' :value='post.visitors' name='visitors' />-->
-<!--    <p id='visitors' style='display:none'>{{ post.visitors }}</p>-->
     <br />
     <img src='Clean%20Map.jpg' class='bkg_img'  alt='Map' />
-    <p id='timestamp'></p>
+    <p id='timestamp' style='visibility: hidden'>P</p>
   </div>
 </template>
 
@@ -36,7 +32,7 @@ export default {
       MyFunctions.moveVisitors(this.post.visitors, this.post.visit)
     },
     replay: function () {
-      MyFunctions.replay()
+      MyFunctions.replay(this.post.visitors)
     },
     changeSpeed: function (speed) {
       MyFunctions.changeSpeed(speed)

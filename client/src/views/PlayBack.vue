@@ -11,6 +11,7 @@
 <script>
 import Map from '@/components/Map.vue'
 import GroupService from '../GroupService.js'
+import { MyFunctions } from '../../public/moveVisitors'
 export default {
   name: 'PlayBack',
   data () {
@@ -36,6 +37,7 @@ export default {
       if (e.target.options.selectedIndex > -1) {
         console.log(e.target.options[e.target.options.selectedIndex].value)
         this.group = e.target.options[e.target.options.selectedIndex].value
+        MyFunctions.replay(this.post.visitors)
       }
     }
   }
