@@ -1,6 +1,7 @@
 <template>
   <div>
     <h1>Bubble Chart</h1>
+    {{ renderChart }}
     <p align="center">
       <svg
         :width="width"
@@ -8,19 +9,19 @@
         :style="{
           backgroundImage: `url(${museumMap})`
         }">
-        <g>
-          <circle
-            v-for="(item, index) in exhibitData"
-            :key="index"
-            :cx="x"
-            :cy="y"
-            :r="r"
-            fill="red"
-            stroke.width="100"
-            stroke="50"
-            @click="onClick()"
-            />
-        </g>
+      <!-- <g>
+        <circle
+          v-for="(item, index) in exhibitData"
+          :key="index"
+          :cx="x"
+          :cy="y"
+          :r="r"
+          fill="red"
+          stroke.width="100"
+          stroke="50"
+          @click="onClick()"
+          />
+      </g> -->
       </svg>
     </p>
   </div>
@@ -35,13 +36,83 @@ export default {
   props: {
     exhibitDataProp: {
       type: Array[Object],
-      required: true,
-      default: { name: 'che divertimento!' }
+      required: false,
+      default: () => [{
+        x: '640',
+        y: '383',
+        name: 'EntranceReubenHecht',
+        type: 'poi',
+        room: '1',
+        backName: 'Exit'
+      },
+      {
+        x: '566',
+        y: '383',
+        name: 'SymbolsJewishMenorah',
+        type: 'poi',
+        room: '1',
+        backName: ''
+      },
+      {
+        x: '506',
+        y: '383',
+        name: 'PersianCult',
+        type: 'poi',
+        room: '1',
+        backName: ''
+      }]
     },
     visitorDataProp: {
       type: Array[Object],
+      required: false,
+      default: () => [{
+        visitorID: '201',
+        groupID: '149',
+        positions: [
+          {
+            startTime: '14:07:37',
+            endTime: '14:10:28',
+            exhibit: 'JerusalemPhoto'
+          },
+          {
+            startTime: '14:10:39',
+            endTime: '14:12:14',
+            exhibit: 'MaterialCultures'
+          },
+          {
+            startTime: '14:12:14',
+            endTime: '14:12:23',
+            exhibit: 'Phoenicians'
+          }
+        ]
+      },
+      {
+        visitorID: '202',
+        groupID: '149',
+        positions: [
+          {
+            startTime: '14:07:37',
+            endTime: '14:10:28',
+            exhibit: 'EntranceReubenHecht'
+          },
+          {
+            startTime: '14:10:39',
+            endTime: '14:12:14',
+            exhibit: 'SymbolsJewishMenorah'
+          },
+          {
+            startTime: '14:12:14',
+            endTime: '14:12:23',
+            exhibit: 'PersianCult'
+          }
+        ]
+      }
+      ]
+    },
+    allData: {
+      type: Array[Object],
       required: true,
-      default: { name: 'ma popo troppo' }
+      default: () => [{}]
     }
   },
   data () {
@@ -55,10 +126,10 @@ export default {
       visitorData: this.visitorDataProp
     }
   },
-  mounted () {
+  created () {
     console.log('BubbleChart loaded')
     // this.fetchData()
-    this.renderChart()
+    // this.renderChart()
   },
   methods: {
     onClick () {
@@ -71,29 +142,25 @@ export default {
     //   const visitorDataTemp = await d3.json('@/visitorsTest.json')
     //   this.visitorData = visitorDataTemp
     // },
-    renderChart () {
-      console.log()
-      const r = d3
-        .scaleLinear()
-        .domain([0, Math.max(...this.calculateAttractionPower())])
-        .range([0, 100])
-      const svg = d3.select('svg')
-        .attr('width', this.width)
-        .attr('height', this.height)
-        .style('background-image', `url(${this.museumMap})`)
-      const output = svg
-        .selectAll('circle')
-        .data(this.exhibitData)
-        .enter()
-        .append('circle')
-        .attr('cx', d => d.x)
-        .attr('cy', d => d.y)
-        .attr('r', d => r)
-        .attr('fill', 'red')
-        .attr('stroke.width', 100)
-        .attr('stroke', 50)
-        .on('click', this.onClick)
-      return output
+    exhibitVisits (name) {
+      console.log('exhibitData', this.exhibitData.length)
+      console.log('visitData', this.visitorData)
+      console.log('visitDataPositions', this.visitorData[0].positions[1])
+      console.log('visitDataExihibit', this.visitorData[0].positions[0].exhibit)
+      const visits = this.visitorData
+        .map(visitor =>
+          visitor.positions.map(pos =>
+            pos.exhibit === name ? 1 : 0)
+            .reduce((count, exhibit) =>
+              count + exhibit
+            ))
+      console.log('visits:', visits)
+      return visits
+    },
+    calculateAttractionPower () {
+      const visitorDataLength = this.visitorData.length
+      console.log('attractionPower', this.exhibitData.map(element => this.exhibitVisits(element.name) / visitorDataLength))
+      return this.exhibitData.map(element => this.exhibitVisits(element.name) / visitorDataLength)
     }
   },
   computed: {
@@ -109,25 +176,41 @@ export default {
       const allExihibits = { id: 'exhibitData', values: exhibitDataSet }
       return allExihibits
     },
-    exhibitVisits (name) {
-      console.log('exhibitData', this.prepareExhibitData().length)
-      console.log('visitData', this.prepareVisitorData())
-      // console.log('visitDataPositions', this.visitorData[0].positions[1])
-      // console.log('visitDataExihibit', this.visitorData.positions.exhibit)
-      const visits = this.prepareVisitorData()
-        .map(visitor =>
-          visitor.positions.forEach(pos =>
-            pos.exhibit === name ? 1 : 0)
-            .reduce((count, exhibit) =>
-              count + exhibit
-            ))
-      console.log('visits:', visits.results)
-      return visits
+    scaleRadius () {
+      const r = d3
+        .scaleLinear()
+        .domain([0, Math.max(...this.calculateAttractionPower())])
+        .range([0, 100])
+      console.log('r', r)
+      return r
     },
-    calculateAttractionPower () {
-      const visitorDataLength = this.visitorData.length
-      console.log(this.exhibitVisits('EntranceReubenHecht'))
-      return this.prepareExhibitData().map(element => this.exhibitVisits(element.name) / visitorDataLength)
+    renderChart () {
+      // const svg = d3.select('svg')
+      //   .attr('width', this.width)
+      //   .attr('height', this.height)
+      //   .style('background-image', `url(${this.museumMap})`)
+      // const output = svg
+      //   .selectAll('circle')
+      //   .data(this.exhibitData)
+      //   .enter()
+      //   .append('circle')
+      //   .attr('cx', d => d.x)
+      //   .attr('cy', d => d.y)
+      //   .attr('r', d => r)
+      //   .attr('fill', 'red')
+      //   .attr('stroke.width', 100)
+      //   .attr('stroke', 50)
+      //   .on('click', this.onClick)
+      const output = this.prepareExhibitData.values()
+      console.log('output', output)
+      return output.map((d, i) => {
+        return {
+          id: i + 1,
+          r: d.scaleRadius(),
+          cx: d.x,
+          cy: d.y
+        }
+      })
     }
   }
 }
