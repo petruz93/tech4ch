@@ -3,8 +3,8 @@
     <div id="nav">
       <router-link to="/">Home</router-link> |
       <router-link to="/about">About</router-link> |
-      <a href="bg.html">click</a> |
-      <router-link to="/map">Map_Vue</router-link>
+<!--      <a href="bg.html">click</a> |-->
+      <router-link to="/map">Cliccami!</router-link>
     </div>
     <router-view/>
   </div>

@@ -2,120 +2,134 @@ import $ from 'jquery'
 
 // The first value is the speed of the animation
 // while the second is the sleep time between the beginning of an animation and the next
-const slowAnimateSpeed = [1000, 2000]
-const fastAnimateSpeed = [500, 500]
+const slowAnimateSpeed = [1500, 2500]
+const fastAnimateSpeed = [400, 400]
 let currentAnimateSpeed = slowAnimateSpeed
-const positions = {}
-let replay = false
+// Current position of every visitor on the map
+// Key: visitor ID
+// Value: visitor's position
+const currentVisitorsPositions = {}
+// Boolean to catch the event from the replay button or the group change
+let stopVisitEvent = false
+// IDs and Classes from the DOM
+const backgroundImageID = '#bkg_img'
+const visitorClass = '.visitor'
+const playButtonID = '#play'
+const timestampParagraphID = '#timestamp'
+const PoIParagraphID = '#poiName'
+const rangeSliderID = '#speedRange'
 
 // Retrieve the current position of the Map in the screen
 function getBkgImagePosition () {
-  return $('.bkg_img').position()
+  return $(backgroundImageID).position()
 }
 
-// Fix the coordinate of the POI, the background image isn't in (0,0)
-function fixPosition (wrongPosition, matPosition = true) {
+function getVisitorImageWidth () {
+  const visitorImageWidth = $(visitorClass).css('width')
+  return +visitorImageWidth.substring(0, +visitorImageWidth.length - +2)
+}
+
+// Fix the coordinate of the PoI, the background image isn't at (0,0)
+// Mat's Position has the correct coordinates while the PoI's need a little fix
+function fixPosition (wrongPosition, matPosition) {
   const bkgPosition = getBkgImagePosition()
-  let width
-  try {
-    width = $('#w1').css('width')
-  } catch (e) {
-    width = 30
-  }
-  width = +width.substring(0, width.length - 2) / +2
+  let visitorImageWidth = getVisitorImageWidth()
+  // The top-left of the visitor image is in the given position, not the center!
+  // With this simple fraction we get the center of the visitor in the PoI ;)
+  // Pro Tip: the image is a square
+  visitorImageWidth = +visitorImageWidth / +2
   const fixedPosition = wrongPosition
   if (!matPosition) {
     fixedPosition.top = +fixedPosition.top + +fixedPosition.top * 0.35
   }
-  fixedPosition.top = +fixedPosition.top + +bkgPosition.top + -width
+  fixedPosition.top = +fixedPosition.top + +bkgPosition.top + -visitorImageWidth
   if (!matPosition) {
     fixedPosition.left = +fixedPosition.left + +fixedPosition.left * 0.35
   }
-  fixedPosition.left = +fixedPosition.left + +bkgPosition.left + -width
+  fixedPosition.left = +fixedPosition.left + +bkgPosition.left + -visitorImageWidth
   return fixedPosition
 }
 
+// Sleep function, it's useful to temporize the movement of the visitors
 function sleep (ms) {
   return new Promise(resolve => setTimeout(resolve, ms))
 }
 
-// Old visit for testing
-// var visitor = [['14:12:05', '430', '383', 'w1'], ['14:12:19', '430', '265', 'w1'], ['14:12:32', '430', '265', 'w2'], ['14:13:23', '430', '383', 'w1'], ['14:14:11', '430', '265', 'w1'], ['14:14:13', '460', '64', 'w2'], ['14:14:47', '430', '383', 'w1'], ['14:14:55', '464', '229', 'w1'], ['14:19:19', '471', '36', 'w1'], ['14:19:49', '540', '48', 'w2'], ['14:20:16', '464', '229', 'w1'], ['14:20:34', '471', '36', 'w1'], ['14:20:55', '460', '64', 'w2'], ['14:21:07', '540', '48', 'w2'], ['14:21:27', '464', '229', 'w1'], ['14:21:36', '540', '48', 'w1'], ['14:21:45', '460', '64', 'w2'], ['14:21:50', '569', '66', 'w1'], ['14:21:51', '569', '66', 'w2'], ['14:21:56', '460', '64', 'w1'], ['14:22:17', '460', '64', 'w2'], ['14:22:18', '471', '36', 'w1'], ['14:22:19', '540', '48', 'w2'], ['14:22:34', '540', '48', 'w1'], ['14:24:17', '569', '66', 'w1'], ['14:24:23', '569', '66', 'w2'], ['14:24:32', '540', '48', 'w1'], ['14:24:37', '569', '66', 'w1'], ['14:25:36', '540', '48', 'w1'], ['14:25:58', '569', '66', 'w1'], ['14:27:03', '540', '48', 'w1'], ['14:28:51', '574', '340', 'w2'], ['14:29:38', '640', '383', 'w1'], ['14:29:48', '537', '315', 'w2'], ['14:31:27', '486', '325', 'w1'], ['14:31:34', '537', '315', 'w1'], ['14:31:50', '526', '335', 'w2'], ['14:32:22', '486', '325', 'w2'], ['14:32:34', '537', '315', 'w2'], ['14:32:43', '486', '325', 'w2'], ['14:32:45', '537', '315', 'w2'], ['14:33:10', '486', '325', 'w2'], ['14:33:25', '486', '325', 'w1'], ['14:33:25', '537', '315', 'w2'], ['14:33:31', '574', '340', 'w1'], ['14:33:33', '537', '315', 'w1'], ['14:35:08', '550', '240', 'w2'], ['14:36:12', '550', '240', 'w1'], ['14:37:08', '464', '229', 'w2'], ['14:38:09', '464', '229', 'w1'], ['14:38:53', '430', '265', 'w2'], ['14:39:50', '430', '265', 'w1'], ['14:40:20', '393', '250', 'w1'], ['14:40:23', '430', '265', 'w1'], ['14:41:04', '393', '250', 'w2'], ['14:41:41', '346', '223', 'w2'], ['14:42:00', '322', '304', 'w2'], ['14:42:25', '288', '324', 'w2'], ['14:42:37', '346', '223', 'w1'], ['14:42:57', '322', '304', 'w1'], ['14:43:27', '322', '304', 'w2'], ['14:43:43', '328', '325', 'w2'], ['14:44:02', '288', '324', 'w2'], ['14:44:05', '288', '324', 'w1'], ['14:44:07', '328', '325', 'w1'], ['14:44:13', '288', '324', 'w1'], ['14:44:15', '322', '304', 'w1'], ['14:44:25', '328', '325', 'w1'], ['14:44:41', '301', '290', 'w1'], ['14:45:06', '301', '290', 'w2'], ['14:45:47', '265', '297', 'w2'], ['14:46:07', '255', '322', 'w1'], ['14:46:15', '301', '290', 'w1'], ['14:46:21', '301', '290', 'w2'], ['14:46:22', '288', '324', 'w1'], ['14:46:27', '265', '297', 'w1'], ['14:46:29', '255', '322', 'w2'], ['14:47:09', '284', '276', 'w2'], ['14:49:16', '396', '154', 'w2'], ['14:50:42', '372', '198', 'w2'], ['14:50:50', '346', '223', 'w2'], ['14:52:08', '372', '198', 'w2'], ['14:52:25', '235', '248', 'w2'], ['14:52:59', '265', '297', 'w2'], ['14:53:37', '235', '248', 'w2'], ['14:55:17', '346', '223', 'w2'], ['14:56:09', '430', '265', 'w2'], ['14:56:27', '566', '383', 'w2']]
-
-// async function showVisitorsInTheMap (visitors) {
-//   const matPosition = { top: 510, left: 940 }
-//   const fixedMatPosition = fixPosition(matPosition)
-//   let xTranslated = 0
-//   for (const element in visitors) {
-//     $('#' + visitors[element]).css('top', fixedMatPosition.top)
-//     $('#' + visitors[element]).css('left', +fixedMatPosition.left + +xTranslated * 35)
-//     $('#' + visitors[element]).css('visibility', 'visible')
-//     positions[visitors[element]] = fixedMatPosition
-//     xTranslated = xTranslated + 1
-//   }
-//   await sleep(1000)
-// }
-
-function translateVisitor (customPosition, visitorInCustomPosition) {
-  for (const [, visitorPosition] of Object.entries(positions)) {
+// Prevent the overlap of the visitors in the same PoI
+function translateVisitor (customPosition, numberOfVisitorsInCustomPosition) {
+  for (const [, visitorPosition] of Object.entries(currentVisitorsPositions)) {
     if (customPosition.top === visitorPosition.top && customPosition.left === visitorPosition.left) {
       customPosition.left = +customPosition.left + +10
-      return translateVisitor(customPosition, +visitorInCustomPosition + +1)
+      return translateVisitor(customPosition, +numberOfVisitorsInCustomPosition + +1)
     }
   }
   return 0
 }
 
-export const MyFunctions = {
+export const MoveVisitorsFunctions = {
+  // Move visitors on the map
   moveVisitors: async function (visitors, visit) {
-    replay = false
+    $(playButtonID).hide()
+    stopVisitEvent = false
     await this.showVisitorsInTheMap(visitors)
-    $('#play').hide()
-    for (const element of visit) {
-      const id = '#' + element[3]
-      const customPosition = fixPosition({ top: element[2], left: element[1] }, false)
-      const visitorInCustomPosition = translateVisitor(customPosition, 0)
-      if (visitorInCustomPosition > 0) {
-        customPosition.left = +customPosition.left + (+10 * +visitorInCustomPosition)
+    for (const visitorMovement of visit) {
+      const visitorID = '#' + visitorMovement[3]
+      const nextPoI = fixPosition({ top: visitorMovement[2], left: visitorMovement[1] }, false)
+      const visitorsInNextPoI = translateVisitor(nextPoI, 0)
+      if (visitorsInNextPoI > 0) {
+        nextPoI.left = +nextPoI.left + (+10 * +visitorsInNextPoI)
       }
-      if (!replay) {
-        $(id).animate(customPosition, currentAnimateSpeed[0])
-        $('#timestamp').text(element[0])
-        $('#timestamp').css('visibility', 'visible')
-        positions[element[3]] = customPosition
+      if (!stopVisitEvent) {
+        $(visitorID).animate(nextPoI, currentAnimateSpeed[0])
+        $(timestampParagraphID).text(visitorMovement[0])
+        $(timestampParagraphID).css('visibility', 'visible')
+        $(PoIParagraphID).text(visitorMovement[4])
+        $(PoIParagraphID).css('visibility', 'visible')
+        currentVisitorsPositions[visitorMovement[3]] = nextPoI
         await sleep(currentAnimateSpeed[1])
       } else {
         return
       }
     }
+    $(playButtonID).show()
   },
-  replay: async function (visitors) {
-    $('#play').hide()
-    replay = true
+  // Reset the visit, stopping the current movement if there's one
+  resetVisit: async function (visitors) {
+    $(playButtonID).hide()
+    stopVisitEvent = true
     await sleep(currentAnimateSpeed[1])
-    $('#play').show()
-    $('#timestamp').css('visibility', 'hidden')
+    $(playButtonID).show()
+    $(timestampParagraphID).css('visibility', 'hidden')
+    $(PoIParagraphID).css('visibility', 'hidden')
     await this.showVisitorsInTheMap(visitors)
-    // window.location.reload()
   },
-  changeSpeed: function (id) {
-    if (id === 'fast') {
-      currentAnimateSpeed = fastAnimateSpeed
-    } else if (id === 'slow') {
-      currentAnimateSpeed = slowAnimateSpeed
-    }
+  // Change the visit speed
+  changeSpeed: function (rangeValue) {
+    const maxSpeedSlider = $(rangeSliderID).attr('max')
+    const minSpeedSlider = $(rangeSliderID).attr('min')
+    const rangeSliderInterval = +maxSpeedSlider - +minSpeedSlider
+    currentAnimateSpeed = [
+      ((Math.abs((fastAnimateSpeed[0] - slowAnimateSpeed[0])) / rangeSliderInterval) *
+        (maxSpeedSlider - rangeValue)) + fastAnimateSpeed[0],
+      ((Math.abs((fastAnimateSpeed[1] - slowAnimateSpeed[1])) / rangeSliderInterval) *
+        (maxSpeedSlider - rangeValue)) + fastAnimateSpeed[1]
+    ]
   },
-  showVisitorsInTheMap: async function (visitors) {
+  // Put visitors on the mat
+  showVisitorsInTheMap: async function (currentVisitorsList) {
     const matPosition = { top: 510, left: 940 }
-    const fixedMatPosition = fixPosition(matPosition)
+    const visitorImageWidth = getVisitorImageWidth()
+    const fixedMatPosition = fixPosition(matPosition, true)
+    // I need to shift visitors to avoid overlap in the mat
     let xTranslated = 0
-    for (const element in visitors) {
-      $('#' + visitors[element]).css('top', fixedMatPosition.top)
-      $('#' + visitors[element]).css('left', +fixedMatPosition.left + +xTranslated * 35)
-      $('#' + visitors[element]).css('visibility', 'visible')
-      positions[visitors[element]] = fixedMatPosition
+    for (const visitor of currentVisitorsList) {
+      const visitorID = '#' + visitor
+      $(visitorID).css('top', fixedMatPosition.top)
+      $(visitorID).css('left', +fixedMatPosition.left + +xTranslated * +visitorImageWidth)
+      $(visitorID).css('visibility', 'visible')
+      currentVisitorsPositions[visitor] = fixedMatPosition
       xTranslated = xTranslated + 1
     }
-    await sleep(1000)
+    await sleep(800)
   }
 }

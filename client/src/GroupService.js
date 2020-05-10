@@ -1,16 +1,15 @@
 import axios from 'axios'
 
-const url = 'http://localhost:8081/hello'
+const url = 'http://localhost:3000/alldata'
 
 class GroupService {
   static async getVisitGroup () {
     try {
       const res = await axios.get(url)
-      const data = res.data
-      return data
-    } catch (e) {
-      console.log(e)
-      throw e
+      return res.data
+    } catch (error) {
+      console.log(error)
+      throw error
     }
   }
 

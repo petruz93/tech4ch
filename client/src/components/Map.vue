@@ -1,41 +1,46 @@
 <template>
   <div class='map'>
-<!--    <p class='group' >{{ group }}</p>-->
     <button id='play' @click='moveVisitors'>&#9658;</button>
     <button id='replay' @click='replay'>&#10227;</button>
-    <input type='radio' id='slow' name='animation_speed' value='slow' @click="changeSpeed('slow')" />
-    <label for='slow'>Slow</label>
-    <input type='radio' id='fast' name='animation_speed' value='fast' @click="changeSpeed('fast')" />
-    <label for='fast'>Fast</label>
-    <img v-for='visitor in post.visitors' :key='visitor' src='human.png' :id='visitor' style='position: absolute;
+    <div class='slideContainer'>
+      <span style='font-size: 23px'>Speed: </span>
+      <input type='range' min='0' max='10' v-bind:value=this.speed id='speedRange' v-on:input=changeSpeed($event)>
+    </div>
+    <img v-for='visitor in visitors' :key='visitor' src='human.png' :id='visitor' style='position: absolute;
       width: 30px;
       height: 30px;
       margin: 5px;
-      visibility: hidden;' alt='Visitor' />
+      visibility: hidden;' alt='Visitor' class='visitor' />
     <br />
-    <img src='Clean%20Map.jpg' class='bkg_img'  alt='Map' />
-    <p id='timestamp' style='visibility: hidden'>P</p>
+    <img src='Clean%20Map.jpg' id='bkg_img'  alt='Map' />
+    <p id='timestamp' style='visibility: hidden'>T</p>
+    <p id='poiName' style='visibility: hidden'>P</p>
   </div>
 </template>
 
 <script>
-import { MyFunctions } from '../../public/moveVisitors'
+import { MoveVisitorsFunctions } from '../../public/moveVisitors'
 export default {
   name: 'Map',
   props: {
-    post: Object,
-    group: String,
-    err: String
+    visit: Array,
+    visitors: Array,
+    group: String
+  },
+  data () {
+    return {
+      speed: 5
+    }
   },
   methods: {
     moveVisitors: function () {
-      MyFunctions.moveVisitors(this.post.visitors, this.post.visit)
+      MoveVisitorsFunctions.moveVisitors(this.visitors, this.visit)
     },
     replay: function () {
-      MyFunctions.replay(this.post.visitors)
+      MoveVisitorsFunctions.resetVisit(this.visitors)
     },
     changeSpeed: function (speed) {
-      MyFunctions.changeSpeed(speed)
+      MoveVisitorsFunctions.changeSpeed(speed.target.value)
     }
   }
 }
