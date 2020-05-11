@@ -50,6 +50,28 @@ export default {
       const visitorDataTemp = await d3.json('./visitorsTest.json')
       this.loadVisitorData = visitorDataTemp
     }
+  },
+  computed: {
+    prepareVisitorData () {
+      const visitorDataSet = d3
+        .entries(this.visitorDataProp)
+      const allVisitors = { id: 'visitorData', values: visitorDataSet }
+      return allVisitors
+    },
+    prepareExhibitData () {
+      const exhibitDataSet = d3
+        .entries(this.exhibitDataProp)
+      const allExihibits = { id: 'exhibitData', values: exhibitDataSet }
+      return allExihibits
+    },
+    scaleRadius () {
+      const r = d3
+        .scaleLinear()
+        .domain([0, Math.max(...this.calculateAttractionPower())])
+        .range([0, 100])
+      console.log('r', r)
+      return r
+    }
   }
 }
 

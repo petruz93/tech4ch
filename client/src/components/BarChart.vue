@@ -3,7 +3,6 @@
     <h1>Bar Chart </h1>
       <div v-if="visitsPerHour!==[]">
         {{ visitsPerHour }}
-        {{ renderVisitsPerHourChart(visitsPerHour) }}
       <svg>
       </svg>
       </div>
@@ -24,16 +23,18 @@ export default {
   },
   data () {
     return {
+      chart: null
     }
   },
   mounted () {
     this.renderVisitsPerHourChart(this.visitsPerHour)
-  },
-  watch: {
-    visitsPerHour (val) {
-      if (this.chart != null) this.chart.remove()
-      this.renderVisitsPerHourChart(val)
-    }
+  // },
+  // watch: {
+  //   visitsPerHour (val) {
+  //     if (this.chart != null) this.chart.remove()
+  //     this.renderVisitsPerHourChart(val)
+  //   }
+  // },
   },
   methods: {
     renderVisitsPerHourChart (visitsPerHour) {
@@ -48,45 +49,50 @@ export default {
         .attr('width', svgWidth)
         .attr('height', svgHeight)
 
-      let chart = svg
-        .append('g')
-        .attr('transform', `translate(${margin}, ${margin})`)
+      const xScale = d3
+        .scaleBand()
+        .range([0, chartWidth])
+        .domain([0, this.visitsPerHourLength])
+        .padding(0.2)
 
       const yScale = d3
         .scaleLinear()
         .range([chartHeight, 0])
         .domain([0, _.max(visitsPerHour)])
       console.log('max', visitsPerHour)
-      chart
+
+      this.chart = svg
+        .append('g')
+        .attr('transform', `translate(${margin}, ${margin})`)
         .append('g')
         .call(d3.axisLeft(yScale).ticks(_.max(visitsPerHour)))
-
-      const xScale = d3
-        .scaleBand()
-        .range([0, chartWidth])
-        .domain([0, visitsPerHour.length])
-        .padding(0.2)
-
-      chart = svg.append('g')
+        .append('g')
         .attr('transform', `translate(0, ${chartHeight})`)
-        .call(d3.axisBottom(xScale).ticks(visitsPerHour.length))
+        .call(d3.axisBottom(xScale).ticks(this.visitsPerHourLength))
 
-      const barGroups = chart
+      const barGroups = this.chart
         .selectAll('rect')
         .data(visitsPerHour)
         .enter()
-      visitsPerHour.forEach(function () {
+
+      // Adds bars to the chart
+      let i = 0
+      while (i < this.visitsPerHourLength) {
         barGroups
           .append('rect')
           .attr('class', 'bar')
-          .attr('x', g => xScale(1))
-          .attr('y', g => yScale(10))
-          .attr('height', g => chartHeight - yScale(0))
+          .attr('x', g => xScale(i))
+          .attr('y', g => yScale(visitsPerHour[i]))
+          .attr('height', g => chartHeight - yScale(visitsPerHour[i]))
           .attr('width', xScale.bandwidth())
-      })
+        i++
+      }
     }
   },
   computed: {
+    visitsPerHourLength () {
+      return this.visitsPerHour.length
+    }
   }
 }
 </script>

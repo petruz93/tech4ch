@@ -29,7 +29,7 @@
 </template>
 
 <script>
-import * as d3 from 'd3'
+// import * as d3 from 'd3'
 import museumMap from '@/assets/museum_clean_map.jpg'
 
 export default {
@@ -38,77 +38,12 @@ export default {
     exhibitDataProp: {
       type: Array[Object],
       required: false,
-      default: () => [{
-        x: '640',
-        y: '383',
-        name: 'EntranceReubenHecht',
-        type: 'poi',
-        room: '1',
-        backName: 'Exit'
-      },
-      {
-        x: '566',
-        y: '383',
-        name: 'SymbolsJewishMenorah',
-        type: 'poi',
-        room: '1',
-        backName: ''
-      },
-      {
-        x: '506',
-        y: '383',
-        name: 'PersianCult',
-        type: 'poi',
-        room: '1',
-        backName: ''
-      }]
+      default: () => [{}]
     },
     visitorDataProp: {
       type: Array[Object],
       required: false,
-      default: () => [{
-        visitorID: '201',
-        groupID: '149',
-        positions: [
-          {
-            startTime: '14:07:37',
-            endTime: '14:10:28',
-            exhibit: 'JerusalemPhoto'
-          },
-          {
-            startTime: '14:10:39',
-            endTime: '14:12:14',
-            exhibit: 'MaterialCultures'
-          },
-          {
-            startTime: '14:12:14',
-            endTime: '14:12:23',
-            exhibit: 'Phoenicians'
-          }
-        ]
-      },
-      {
-        visitorID: '202',
-        groupID: '149',
-        positions: [
-          {
-            startTime: '14:07:37',
-            endTime: '14:10:28',
-            exhibit: 'EntranceReubenHecht'
-          },
-          {
-            startTime: '14:10:39',
-            endTime: '14:12:14',
-            exhibit: 'SymbolsJewishMenorah'
-          },
-          {
-            startTime: '14:12:14',
-            endTime: '14:12:23',
-            exhibit: 'PersianCult'
-          }
-        ]
-      }
-      ]
+      default: () => [{}]
     },
     allData: {
       type: Array[Object],
@@ -122,31 +57,16 @@ export default {
       msg: 'Here is the BubbleChart',
       width: 1149,
       height: 560,
-      museumMap,
-      exhibitData: [],
-      visitorData: []
+      museumMap
     }
   },
   created () {
     console.log('BubbleChart loaded')
-    // this.fetchData()
-    // this.renderChart()
-  },
-  async mounted () {
-    this.exhibitData = await this.exhibitDataProp
-    this.visitorData = await this.visitorDataProp
   },
   methods: {
     onClick () {
       console.log('hey there')
     },
-    // async fetchData () {
-    //   const exhibitDataTemp = await d3.json('@/map-data.json')
-    //   console.log('exhibitDataTemp', exhibitDataTemp)
-    //   this.exhibitData = exhibitDataTemp
-    //   const visitorDataTemp = await d3.json('@/visitorsTest.json')
-    //   this.visitorData = visitorDataTemp
-    // },
     exhibitVisits (name) {
       console.log('exhibitData', this.exhibitData.length)
       console.log('visitData', this.visitorData)
@@ -169,26 +89,6 @@ export default {
     }
   },
   computed: {
-    prepareVisitorData () {
-      const visitorDataSet = d3
-        .entries(this.visitorDataProp)
-      const allVisitors = { id: 'visitorData', values: visitorDataSet }
-      return allVisitors
-    },
-    prepareExhibitData () {
-      const exhibitDataSet = d3
-        .entries(this.exhibitDataProp)
-      const allExihibits = { id: 'exhibitData', values: exhibitDataSet }
-      return allExihibits
-    },
-    scaleRadius () {
-      const r = d3
-        .scaleLinear()
-        .domain([0, Math.max(...this.calculateAttractionPower())])
-        .range([0, 100])
-      console.log('r', r)
-      return r
-    },
     renderChart () {
       // const svg = d3.select('svg')
       //   .attr('width', this.width)
