@@ -1,6 +1,7 @@
 <template>
   <div>
     <h1>Bubble Chart</h1>
+    {{ exhibitDataProp }}
     {{ renderChart }}
     <p align="center">
       <svg
@@ -122,14 +123,18 @@ export default {
       width: 1149,
       height: 560,
       museumMap,
-      exhibitData: this.exhibitDataProp,
-      visitorData: this.visitorDataProp
+      exhibitData: [],
+      visitorData: []
     }
   },
   created () {
     console.log('BubbleChart loaded')
     // this.fetchData()
     // this.renderChart()
+  },
+  async mounted () {
+    this.exhibitData = await this.exhibitDataProp
+    this.visitorData = await this.visitorDataProp
   },
   methods: {
     onClick () {
@@ -166,13 +171,13 @@ export default {
   computed: {
     prepareVisitorData () {
       const visitorDataSet = d3
-        .entries(this.visitorData)
+        .entries(this.visitorDataProp)
       const allVisitors = { id: 'visitorData', values: visitorDataSet }
       return allVisitors
     },
     prepareExhibitData () {
       const exhibitDataSet = d3
-        .entries(this.exhibitData)
+        .entries(this.exhibitDataProp)
       const allExihibits = { id: 'exhibitData', values: exhibitDataSet }
       return allExihibits
     },
@@ -201,16 +206,17 @@ export default {
       //   .attr('stroke.width', 100)
       //   .attr('stroke', 50)
       //   .on('click', this.onClick)
-      const output = this.prepareExhibitData.values()
+      const output = this.exhibitDataProp
       console.log('output', output)
-      return output.map((d, i) => {
-        return {
-          id: i + 1,
-          r: d.scaleRadius(),
-          cx: d.x,
-          cy: d.y
-        }
-      })
+      return output
+    //   output.map((d, i) => {
+    //     return {
+    //       id: i + 1,
+    //       r: d.scaleRadius(),
+    //       cx: d.x,
+    //       cy: d.y
+    //     }
+    //   })
     }
   }
 }

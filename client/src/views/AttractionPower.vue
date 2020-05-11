@@ -2,9 +2,10 @@
   <div>
     <BubbleChart
       v-if="!undefined"
-      allData="loadAllData" />
-       <!-- :exhibitData=loadExhibitData
-      :visitorData=loadVisitorData -->
+      :exhibitDataProp=loadExhibitData
+      :visitorDataProp=loadVisitorData
+      />
+<!-- allData="loadAllData" -->
   </div>
 </template>
 
@@ -21,18 +22,18 @@ export default {
   },
   data () {
     return {
-      loadAllData: []
-      // loadExhibitData: [],
-      // loadVisitorData: []
+      // loadAllData: []
+      loadExhibitData: [],
+      loadVisitorData: []
     }
   },
   async created () {
     console.log('Data read')
-    this.fetchAllData()
+    // this.fetchAllData()
   },
   async mounted () {
     console.log('App loaded')
-    // this.fetchData()
+    this.fetchData()
   },
   methods: {
     async fetchAllData () {
@@ -42,13 +43,13 @@ export default {
       } catch (err) {
         this.err = err.message
       }
+    },
+    async fetchData () {
+      const exhibitDataTemp = await d3.json('./map-data.json')
+      this.loadExhibitData = exhibitDataTemp
+      const visitorDataTemp = await d3.json('./visitorsTest.json')
+      this.loadVisitorData = visitorDataTemp
     }
-    // async fetchData () {
-    //   const exhibitDataTemp = await d3.json('./map-data.json')
-    //   this.loadExhibitData = exhibitDataTemp
-    //   const visitorDataTemp = await d3.json('./visitorsTest.json')
-    //   this.loadVisitorData = visitorDataTemp
-    // }
   }
 }
 

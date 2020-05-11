@@ -1,7 +1,7 @@
 <template>
   <div>
-    <h1>Visitors Per Hour Charts</h1>
-    <!-- <form action="#" @submit.prevent="getIssues">
+    <h1>Visits Per Hour Charts</h1>
+    <form action="#" @submit.prevent="getIssues">
       <div class="form-group">
         <input
           type="text"
@@ -10,10 +10,10 @@
           class="col-md-2 col-md-offset-5"
         >
       </div>
-    </form> -->
-    <BarChart
-      :exhibitDataProp=loadExhibitData
-      :visitDataProp=loadVisitData
+    </form>
+    <p class ='error' v-if='visitsPerHourData===[]'> visitsPerHour props is empty! </p>
+      <BarChart
+      :visitsPerHour=this.visitsPerHourData
       />
   </div>
 </template>
@@ -23,20 +23,21 @@
 // import moment from 'moment'
 // import axios from 'axios'
 import * as d3 from 'd3'
-import BarChart from '@/components/BarChart.vue'
 
 export default {
   name: 'VisitorsPerHour',
   components: {
-    BarChart
+    BarChart: () => import('@/components/BarChart.vue')
   },
   data () {
     return {
-      loadExhibitData: [],
-      loadVisitData: []
+      exhibitData: [],
+      visitData: [],
+      visitsPerHourData: [],
+      repository: ''
     }
   },
-  mounted () {
+  created () {
     console.log('App loaded')
     this.fetchData()
     // this.getIssues()
@@ -44,51 +45,82 @@ export default {
   methods: {
     async fetchData () {
       const exhibitDataTemp = await d3.json('./map-data.json')
-      this.loadExhibitData = exhibitDataTemp
+      this.exhibitData = exhibitDataTemp
       const visitDataTemp = await d3.json('./visitorsTest.json')
-      this.loadVisitData = visitDataTemp
+      this.visitData = visitDataTemp
+      this.visitsPerHourData = this.visitsPerHour
     }
-    // getIssues () {
-    //   this.startDate = '2020-04-20'
-    //   // moment()
-    //   // .subtract(6, 'days')
-    //   // .format('YYYY-MM-DD')
-    //   console.log('startDate', this.startDate)
-    //   axios
-    //     .get(`https://api.github.com/search/issues?q=repo:${this.repository}+is:issues+is:open+created:>=${this.startDate}`,
-    //       { params: { per_page: 100 } }
-    //     )
-    //     .then(response => {
-    //       const payload = this.getDateRange()
-
-    //       response.data.items.forEach(item => {
-    //         const key = moment(item.created_at).format('MMM Do YY')
-    //         const obj = payload.filter(o => o.day === key)[0]
-    //         obj.issues += 1
-    //       })
-    //       this.issues = payload
-    //       console.log(this.issues)
-    //     })
-    //     .catch(error => {
-    //       console.error(error)
-    //     })
-    // },
-    // getDateRange () {
-    //   const startDate = '2020-04-20'
-    //   // moment().subtract(6, 'days')
-    //   const endDate = moment()
-    //   const dates = []
-
-    //   while (startDate.isSameOrBefore(endDate)) {
-    //     dates.push({
-    //       day: startDate.format('MMM Do YY'),
-    //       issues: 0
-    //     })
-
-    //     startDate.add(1, 'days')
+  },
+  computed: {
+    // Indexes exhibits by room
+    roomToExhibit () {
+      const roomToExhibit = d3
+        .nest()
+        .key(d => d.room)
+        .entries(this.exhibitData)
+      return roomToExhibit
+    },
+    // Displays and sorts rooms by their number
+    allRooms () {
+      const allRooms = this.roomToExhibit
+        .map(exhibit => Number(exhibit.key))
+      return allRooms.sort(function (a, b) {
+        return a - b
+      })
+    },
+    // Indexes exhibits by name
+    exhibitToRoom () {
+      const exhibitToRoom = d3
+        .nest()
+        .key(d => d.name)
+        .entries(this.exhibitData)
+      return exhibitToRoom
+    },
+    // Given the visits array, outputs an array of 24 elements representing
+    // the number of visits for a given hour
+    visitsPerHour () {
+      let i = 0
+      const visitsPerHour = []
+      // console.log(_.get(this.visitDataProp, 'positions'))
+      while (i < 24) {
+        const visitorPerHourTemp = this.visitData
+          .filter(visit => Number(visit.positions[0].startTime.split(':')[0]) === i)
+        visitsPerHour[i] = visitorPerHourTemp
+        i++
+      }
+      return visitsPerHour.map(vph => vph.length)
+    },
+    allVisitExhibits () {
+      const visitPositions = this.visitData
+        .map(v => v.positions)
+      return d3
+        .nest()
+        .key(d => d.exhibit)
+        .entries(visitPositions)
+      // d3
+      //   .nest()
+      //   .key(d => d.positions)
+      //   .entries(this.visitData)
+    },
+    exhibitToVisit () {
+      const exhibitToVisit = d3
+        .nest()
+        .key(d => d.positions.exhibit)
+        .entries(this.visitData)
+      return exhibitToVisit
+    }
+    // }
+    // visitsPerRoomPerHour () {
+    //   let i = 0
+    //   const visitsPerHour = []
+    //   // console.log(_.get(this.visitDataProp, 'positions'))
+    //   while (i < 24) {
+    //     const visitorPerHourTemp = this.visitData
+    //       .filter(visit => Number(visit.positions[0].startTime.split(':')[0]) === i)
+    //     visitsPerHour[i] = { 'key': visitorPerHourTemp.room, visitorPerHourTemp}
+    //     i++
     //   }
-
-    //   return dates
+    //   return visitsPerHour.map(vph => vph.length)
     // }
   }
 }
