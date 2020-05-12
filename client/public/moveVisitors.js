@@ -69,29 +69,31 @@ function translateVisitor (customPosition, numberOfVisitorsInCustomPosition) {
 export const MoveVisitorsFunctions = {
   // Move visitors on the map
   moveVisitors: async function (visitors, visit) {
-    $(playButtonID).hide()
-    stopVisitEvent = false
-    await this.showVisitorsInTheMap(visitors)
-    for (const visitorMovement of visit) {
-      const visitorID = '#' + visitorMovement[3]
-      const nextPoI = fixPosition({ top: visitorMovement[2], left: visitorMovement[1] }, false)
-      const visitorsInNextPoI = translateVisitor(nextPoI, 0)
-      if (visitorsInNextPoI > 0) {
-        nextPoI.left = +nextPoI.left + (+10 * +visitorsInNextPoI)
+    if (visitors.length > 0 && visit.length > 0) {
+      $(playButtonID).hide()
+      stopVisitEvent = false
+      // await this.showVisitorsInTheMap(visitors)
+      for (const visitorMovement of visit) {
+        const visitorID = '#' + visitorMovement[3]
+        const nextPoI = fixPosition({ top: visitorMovement[2], left: visitorMovement[1] }, false)
+        const visitorsInNextPoI = translateVisitor(nextPoI, 0)
+        if (visitorsInNextPoI > 0) {
+          nextPoI.left = +nextPoI.left + (+10 * +visitorsInNextPoI)
+        }
+        if (!stopVisitEvent) {
+          $(visitorID).animate(nextPoI, currentAnimateSpeed[0])
+          $(timestampParagraphID).text(visitorMovement[0])
+          $(timestampParagraphID).css('visibility', 'visible')
+          $(PoIParagraphID).text(visitorMovement[4])
+          $(PoIParagraphID).css('visibility', 'visible')
+          currentVisitorsPositions[visitorMovement[3]] = nextPoI
+          await sleep(currentAnimateSpeed[1])
+        } else {
+          return
+        }
       }
-      if (!stopVisitEvent) {
-        $(visitorID).animate(nextPoI, currentAnimateSpeed[0])
-        $(timestampParagraphID).text(visitorMovement[0])
-        $(timestampParagraphID).css('visibility', 'visible')
-        $(PoIParagraphID).text(visitorMovement[4])
-        $(PoIParagraphID).css('visibility', 'visible')
-        currentVisitorsPositions[visitorMovement[3]] = nextPoI
-        await sleep(currentAnimateSpeed[1])
-      } else {
-        return
-      }
+      $(playButtonID).show()
     }
-    $(playButtonID).show()
   },
   // Reset the visit, stopping the current movement if there's one
   resetVisit: async function (visitors) {
@@ -130,6 +132,6 @@ export const MoveVisitorsFunctions = {
       currentVisitorsPositions[visitor] = fixedMatPosition
       xTranslated = xTranslated + 1
     }
-    await sleep(800)
+    // await sleep(800)
   }
 }
