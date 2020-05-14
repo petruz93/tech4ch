@@ -1,17 +1,16 @@
 <template>
   <div>
     <h1>Bar Chart </h1>
-      <div v-if="visitsPerHour!==[]">
-        {{ visitsPerHour }}
-      <svg>
-      </svg>
-      </div>
+        <div class="barChart" v-if="visitsPerHour!==[]">
+        <svg>
+          {{ this.renderChart }}
+        </svg>
+        </div>
   </div>
 </template>
 
 <script>
 import * as d3 from 'd3'
-import _ from 'lodash'
 
 export default {
   name: 'BarChart',
@@ -23,76 +22,78 @@ export default {
   },
   data () {
     return {
-      chart: null
+      chart: null,
+      color: 'steelblue',
+      height: 400,
+      width: 500,
+      margin: ({ top: 30, right: 0, bottom: 30, left: 40 })
     }
   },
   mounted () {
-    this.renderVisitsPerHourChart(this.visitsPerHour)
-  // },
-  // watch: {
-  //   visitsPerHour (val) {
-  //     if (this.chart != null) this.chart.remove()
-  //     this.renderVisitsPerHourChart(val)
-  //   }
-  // },
+    // this.renderChart(this.visitsPerHour)
+    // this.renderVisitsPerHourChart(this.visitsPerHour)
   },
   methods: {
-    renderVisitsPerHourChart (visitsPerHour) {
-      const margin = 60
-      const svgWidth = 1000
-      const svgHeight = 600
-      const chartWidth = 1000 - 2 * margin
-      const chartHeight = 600 - 2 * margin
-
-      const svg = d3
-        .select('svg')
-        .attr('width', svgWidth)
-        .attr('height', svgHeight)
-
-      const xScale = d3
-        .scaleBand()
-        .range([0, chartWidth])
-        .domain([0, this.visitsPerHourLength])
-        .padding(0.2)
-
-      const yScale = d3
-        .scaleLinear()
-        .range([chartHeight, 0])
-        .domain([0, _.max(visitsPerHour)])
-      console.log('max', visitsPerHour)
-
-      this.chart = svg
-        .append('g')
-        .attr('transform', `translate(${margin}, ${margin})`)
-        .append('g')
-        .call(d3.axisLeft(yScale).ticks(_.max(visitsPerHour)))
-        .append('g')
-        .attr('transform', `translate(0, ${chartHeight})`)
-        .call(d3.axisBottom(xScale).ticks(this.visitsPerHourLength))
-
-      const barGroups = this.chart
-        .selectAll('rect')
-        .data(visitsPerHour)
-        .enter()
-
-      // Adds bars to the chart
-      let i = 0
-      while (i < this.visitsPerHourLength) {
-        barGroups
-          .append('rect')
-          .attr('class', 'bar')
-          .attr('x', g => xScale(i))
-          .attr('y', g => yScale(visitsPerHour[i]))
-          .attr('height', g => chartHeight - yScale(visitsPerHour[i]))
-          .attr('width', xScale.bandwidth())
-        i++
-      }
-    }
   },
   computed: {
     visitsPerHourLength () {
       return this.visitsPerHour.length
+    },
+    renderChart () {
+      const svg = d3
+        .select('svg')
+        .attr('viewBox', [0, 0, this.width, this.height])
+
+      const x = d3.scaleBand()
+        .domain(d3.range(this.visitsPerHour.length))
+        .range([this.margin.left, this.width - this.margin.right])
+        .padding(0.1)
+
+      const y = d3.scaleLinear()
+        .domain([0, d3.max(this.visitsPerHour)]).nice()
+        .range([this.height - this.margin.bottom, this.margin.top])
+
+      svg.append('g')
+        .attr('fill', this.color)
+        .selectAll('rect')
+        .data(this.visitsPerHour)
+        .join('rect')
+        .attr('x', (d, i) => x(i))
+        .attr('y', d => y(d))
+        .attr('height', d => y(0) - y(d))
+        .attr('width', x.bandwidth())
+
+      const xAxis = g => g
+        .attr('transform', `translate(0,${this.height - this.margin.bottom})`)
+        .call(d3.axisBottom(x).ticks(i => i).tickSizeOuter(0))
+
+      const yAxis = g => g
+        .attr('transform', `translate(${this.margin.left},0)`)
+        .call(d3.axisLeft(y).ticks(d3.max(this.visitsPerHour)))
+        // .call(g => g.select('.domain').remove())
+        .call(g => g.append('text')
+          .attr('x', -this.margin.left)
+          .attr('y', 10)
+          .attr('fill', 'currentColor')
+          // .attr('text-anchor', 'start')
+          .text(d3.max(this.visitsPerHour)))
+
+      svg.append('g')
+        .call(xAxis)
+
+      svg.append('g')
+        .call(yAxis)
+      console.log(this.visitsPerHour)
+      return svg.node()
     }
   }
 }
 </script>
+
+<style scoped>
+.barChart {
+  margin: 0 auto;
+  height: 80%;
+  width: 80%
+}
+</style>
