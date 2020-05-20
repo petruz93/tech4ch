@@ -19,9 +19,14 @@ const routes = [
     component: () => import(/* webpackChunkName: "about" */ '../views/About.vue')
   },
   {
-    path: '/map',
-    name: 'Map',
-    component: () => import(/* webpackChunkName: "map" */ '../views/PlayBack.vue')
+    path: '/playback',
+    name: 'PlayBack',
+    component: () => import(/* webpackChunkName: "playback" */ '../views/PlayBack.vue')
+  },
+  {
+    path: '/visitsummary',
+    name: 'VisitSummary',
+    component: () => import(/* webpackChunkName: "visitsummary" */ '../views/VisitSummary.vue')
   }
 ]
 

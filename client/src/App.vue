@@ -4,7 +4,8 @@
       <router-link to="/">Home</router-link> |
       <router-link to="/about">About</router-link> |
 <!--      <a href="bg.html">click</a> |-->
-      <router-link to="/map">Cliccami!</router-link>
+      <router-link to="/playback">PlayBack</router-link> |
+      <router-link to="/visitsummary">Visit Summary</router-link>
     </div>
     <router-view/>
   </div>
