@@ -3,33 +3,21 @@
     <h1>Bubble Chart</h1>
     {{ exhibitDataProp }}
     {{ renderChart }}
-    <p align="center">
+    <p align='center'>
       <svg
         :width="width"
         :height="height"
         :style="{
           backgroundImage: `url(${museumMap})`
-        }">
-      <!-- <g>
-        <circle
-          v-for="(item, index) in exhibitData"
-          :key="index"
-          :cx="x"
-          :cy="y"
-          :r="r"
-          fill="red"
-          stroke.width="100"
-          stroke="50"
-          @click="onClick()"
-          />
-      </g> -->
+        }"
+      >
       </svg>
     </p>
   </div>
 </template>
 
 <script>
-// import * as d3 from 'd3'
+import * as d3 from 'd3'
 import museumMap from '@/assets/museum_clean_map.jpg'
 
 export default {
@@ -45,10 +33,15 @@ export default {
       required: false,
       default: () => [{}]
     },
-    allData: {
+    bubbleChartData: {
       type: Array[Object],
       required: true,
       default: () => [{}]
+    },
+    bubbleChartCoordinates: {
+      type: Array,
+      required: true,
+      default: () => []
     }
   },
   data () {
@@ -66,63 +59,78 @@ export default {
   methods: {
     onClick () {
       console.log('hey there')
-    },
-    exhibitVisits (name) {
-      console.log('exhibitData', this.exhibitData.length)
-      console.log('visitData', this.visitorData)
-      console.log('visitDataPositions', this.visitorData[0].positions[1])
-      console.log('visitDataExihibit', this.visitorData[0].positions[0].exhibit)
-      const visits = this.visitorData
-        .map(visitor =>
-          visitor.positions.map(pos =>
-            pos.exhibit === name ? 1 : 0)
-            .reduce((count, exhibit) =>
-              count + exhibit
-            ))
-      console.log('visits:', visits)
-      return visits
-    },
-    calculateAttractionPower () {
-      const visitorDataLength = this.visitorData.length
-      console.log('attractionPower', this.exhibitData.map(element => this.exhibitVisits(element.name) / visitorDataLength))
-      return this.exhibitData.map(element => this.exhibitVisits(element.name) / visitorDataLength)
     }
   },
   computed: {
     renderChart () {
-      // const svg = d3.select('svg')
-      //   .attr('width', this.width)
-      //   .attr('height', this.height)
-      //   .style('background-image', `url(${this.museumMap})`)
-      // const output = svg
-      //   .selectAll('circle')
-      //   .data(this.exhibitData)
-      //   .enter()
-      //   .append('circle')
-      //   .attr('cx', d => d.x)
-      //   .attr('cy', d => d.y)
-      //   .attr('r', d => r)
-      //   .attr('fill', 'red')
-      //   .attr('stroke.width', 100)
-      //   .attr('stroke', 50)
-      //   .on('click', this.onClick)
-      const output = this.exhibitDataProp
-      console.log('output', output)
-      return output
-    //   output.map((d, i) => {
-    //     return {
-    //       id: i + 1,
-    //       r: d.scaleRadius(),
-    //       cx: d.x,
-    //       cy: d.y
-    //     }
-    //   })
+      const radius = d3.scaleSqrt(
+        [0, d3.quantile([...this.bubbleChartData.values()].sort(d3.ascending), 0.985)],
+        [0, 15]
+      )
+
+      // const path = d3.geoPath();
+
+      // const us = FileAttachment("counties-albers-10m.json").json();
+
+      const svg = d3.create('svg').attr('viewBox', [0, 0, 975, 610])
+
+      // svg
+      //   .append("path")
+      //   .datum(topojson.feature(us, us.objects.nation))
+      //   .attr("fill", "#ccc")
+      //   .attr("d", path);
+
+      // svg
+      //   .append("path")
+      //   .datum(topojson.mesh(us, us.objects.states, (a, b) => a !== b))
+      //   .attr("fill", "none")
+      //   .attr("stroke", "white")
+      //   .attr("stroke-linejoin", "round")
+      //   .attr("d", path);
+
+      const legend = svg
+        .append('g')
+        .attr('fill', '#777')
+        .attr('transform', 'translate(925,608)')
+        .attr('text-anchor', 'middle')
+        .style('font', '10px sans-serif')
+        .selectAll('g')
+        .data([1e6, 5e6, 1e7])
+        .join('g')
+
+      legend
+        .append('circle')
+        .attr('fill', 'none')
+        .attr('stroke', '#ccc')
+        .attr('cy', d => -radius(d))
+        .attr('r', radius)
+
+      legend
+        .append('text')
+        .attr('y', d => -2 * radius(d))
+        .attr('dy', '1.3em')
+        .text(d3.format('.1s'))
+
+      svg
+        .append('g')
+        .attr('fill', 'brown')
+        .attr('fill-opacity', 0.5)
+        .attr('stroke', '#fff')
+        .attr('stroke-width', 0.5)
+        .selectAll('circle')
+        .data(this.bubbleChartData)
+        .join('circle')
+        .attr('transform', d => `translate(${this.bubbleChartCoordinates.x},${this.bubbleChartCoordinates.y})`)
+        .attr('r', d => radius(d.value))
+        .append('title')
+        .text(
+          d => `${d.properties.name}`
+        )
+      return svg.node()
     }
   }
 }
-
 </script>
 
 <style scoped>
-
 </style>

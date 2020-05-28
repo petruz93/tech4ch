@@ -2,8 +2,10 @@
   <div>
     <BubbleChart
       v-if="!undefined"
-      :exhibitDataProp=loadExhibitData
+      :exhibitDataProp=exhibitData
       :visitorDataProp=loadVisitorData
+      :bubbleChartData=attractionPowers
+      :bubbleChartCoordinates=pointOfInterests
       />
 <!-- allData="loadAllData" -->
   </div>
@@ -24,14 +26,11 @@ export default {
     return {
       // loadAllData: []
       loadExhibitData: [],
-      loadVisitorData: []
+      loadVisitorData: [],
+      exhibitData: []
     }
   },
-  async created () {
-    console.log('Data read')
-    // this.fetchAllData()
-  },
-  async mounted () {
+  created () {
     console.log('App loaded')
     this.fetchData()
   },
@@ -47,6 +46,7 @@ export default {
     async fetchData () {
       const exhibitDataTemp = await d3.json('./map-data.json')
       this.loadExhibitData = exhibitDataTemp
+      this.exhibitData = this.prepareExhibitData
       const visitorDataTemp = await d3.json('./visitorsTest.json')
       this.loadVisitorData = visitorDataTemp
     }
@@ -71,6 +71,26 @@ export default {
         .range([0, 100])
       console.log('r', r)
       return r
+    },
+    pointOfInterests () {
+      return this.exhibitData.map(d =>
+        [d.x, d.y])
+    },
+    exhibitToVisits () {
+      const visits = this.visitorData
+        .map(v =>
+          v.positions.map(p =>
+            p.exhibit)
+            .reduce((count, exhibit) =>
+              count + exhibit
+            ))
+      console.log('visits:', visits)
+      return visits
+    },
+    attractionPowers () {
+      const visitorDataLength = this.visitorData.length
+      console.log('attractionPower', this.exhibitData.map(e => this.exhibitVisits.map(ev => ev / visitorDataLength)))
+      return this.exhibitData.map(e => this.exhibitVisits.map(ev => ev / visitorDataLength))
     }
   }
 }

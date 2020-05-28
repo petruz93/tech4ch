@@ -1,19 +1,13 @@
 <template>
   <div>
     <h1>Visits Per Hour Charts</h1>
-    <form action="#" @submit.prevent="getIssues">
-      <div class="form-group">
-        <input
-          type="text"
-          placeholder="owner/repo Name"
-          v-model="repository"
-          class="col-md-2 col-md-offset-5"
-        >
-      </div>
-    </form>
     <p class ='error' v-if='visitsPerHourData===[]'> visitsPerHour props is empty! </p>
       <BarChart
-      :visitsPerHour=this.visitsPerHourData
+        :barChartData=this.visitsPerHourData
+      />
+      <h1>Visits Per Room Per Hour Charts</h1>
+      <SNHBarChart
+        :stackedBarChartData=this.visitsPerRoomPerHour
       />
   </div>
 </template>
@@ -27,13 +21,15 @@ import * as d3 from 'd3'
 export default {
   name: 'VisitorsPerHour',
   components: {
-    BarChart: () => import('@/components/BarChart.vue')
+    BarChart: () => import('@/components/BarChart.vue'),
+    SNHBarChart: () => import('@/components/SNHBarChart')
   },
   data () {
     return {
       exhibitData: [],
       visitData: [],
       visitsPerHourData: [],
+      visitsPerRoomPerHour: [],
       repository: ''
     }
   },
@@ -49,6 +45,7 @@ export default {
       const visitDataTemp = await d3.json('./visitorsTest.json')
       this.visitData = visitDataTemp
       this.visitsPerHourData = this.visitsPerHour
+      this.visitsPerRoomPerHour = this.visitsPerHour
     }
   },
   computed: {
