@@ -16,6 +16,7 @@ export default {
   name: 'BarChart',
   props: {
     barChartData: {
+      required: true,
       type: Array,
       default: () => []
     }

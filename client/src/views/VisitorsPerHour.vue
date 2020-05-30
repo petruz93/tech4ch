@@ -17,12 +17,13 @@
 // import moment from 'moment'
 // import axios from 'axios'
 import * as d3 from 'd3'
+import GroupService from '@/GroupService'
 
 export default {
   name: 'VisitorsPerHour',
   components: {
     BarChart: () => import('@/components/BarChart.vue'),
-    SNHBarChart: () => import('@/components/SNHBarChart')
+    SNHBarChart: () => import('@/components/StackedBarChart')
   },
   data () {
     return {
@@ -33,10 +34,26 @@ export default {
       repository: ''
     }
   },
-  created () {
+  async created () {
     console.log('App loaded')
     this.fetchData()
     // this.getIssues()
+
+    // Get data from the backend
+    try {
+      const data = await GroupService.getVisitGroup()
+      const PoICoordinates = {}
+      for (const PoI of data.mapData) {
+        PoICoordinates[PoI.name] = [PoI.x, PoI.y]
+      }
+      this.mapData = PoICoordinates
+      this.visitorsData = data.visitorsData
+      this.groupList = this.visitorsData.map(visitorData => visitorData.groupID)
+      // Cut group duplicates
+      this.groupList = this.groupList.filter((groupElement, groupIndex) => this.groupList.indexOf(groupElement) === groupIndex)
+    } catch (error) {
+      this.error = error.message
+    }
   },
   methods: {
     async fetchData () {
@@ -80,7 +97,7 @@ export default {
       const visitsPerHour = []
       // console.log(_.get(this.visitDataProp, 'positions'))
       while (i < 24) {
-        const visitorPerHourTemp = this.visitData
+        const visitorPerHourTemp = this.data
           .filter(visit => Number(visit.positions[0].startTime.split(':')[0]) === i)
         visitsPerHour[i] = visitorPerHourTemp
         i++

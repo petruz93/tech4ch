@@ -189,6 +189,195 @@
     ]
   },
   {
+    "visitorID": "201",
+    "groupID": "149",
+    "positions": [
+      {
+        "startTime": "15:07:37",
+        "endTime": "14:10:28",
+        "exhibit": "JerusalemPhoto"
+      },
+      {
+        "startTime": "14:10:39",
+        "endTime": "14:12:14",
+        "exhibit": "MaterialCultures"
+      },
+      {
+        "startTime": "14:12:14",
+        "endTime": "14:12:23",
+        "exhibit": "Phoenicians"
+      },
+      {
+        "startTime": "14:12:23",
+        "endTime": "14:13:46",
+        "exhibit": "BuildingMethodsAndFacilities"
+      },
+      {
+        "startTime": "14:13:46",
+        "endTime": "14:13:46",
+        "exhibit": "Phoenicians"
+      },
+      {
+        "startTime": "14:13:46",
+        "endTime": "14:13:48",
+        "exhibit": "PhoenicianWriting1"
+      },
+      {
+        "startTime": "14:13:48",
+        "endTime": "14:14:01",
+        "exhibit": "BuildingMethodsAndFacilities"
+      },
+      {
+        "startTime": "14:14:01",
+        "endTime": "14:15:21",
+        "exhibit": "EverydayPottery"
+      },
+      {
+        "startTime": "14:15:21",
+        "endTime": "14:16:05",
+        "exhibit": "PhoenicianWriting1"
+      },
+      {
+        "startTime": "14:16:05",
+        "endTime": "14:16:42",
+        "exhibit": "EverydayPottery"
+      },
+      {
+        "startTime": "14:16:42",
+        "endTime": "14:16:59",
+        "exhibit": "ReligionAndCult"
+      },
+      {
+        "startTime": "14:16:59",
+        "endTime": "14:18:13",
+        "exhibit": "BuildingMethodsAndFacilities"
+      },
+      {
+        "startTime": "14:18:13",
+        "endTime": "14:19:29",
+        "exhibit": "EverydayPottery"
+      },
+      {
+        "startTime": "14:19:29",
+        "endTime": "14:19:33",
+        "exhibit": "BuildingMethodsAndFacilities"
+      },
+      {
+        "startTime": "14:19:33",
+        "endTime": "14:19:46",
+        "exhibit": "CraftsAndArts"
+      },
+      {
+        "startTime": "14:19:46",
+        "endTime": "14:19:57",
+        "exhibit": "ImportedPottery"
+      },
+      {
+        "startTime": "14:19:57",
+        "endTime": "14:20:58",
+        "exhibit": "MaritimeCommerce"
+      },
+      {
+        "startTime": "14:20:58",
+        "endTime": "14:22:16",
+        "exhibit": "ImportedPottery"
+      },
+      {
+        "startTime": "14:22:16",
+        "endTime": "14:22:49",
+        "exhibit": "GlassOvenVessels"
+      },
+      {
+        "startTime": "14:22:49",
+        "endTime": "14:24:03",
+        "exhibit": "BronzeTools"
+      },
+      {
+        "startTime": "14:24:03",
+        "endTime": "14:25:30",
+        "exhibit": "GlassOvenVessels"
+      },
+      {
+        "startTime": "14:25:30",
+        "endTime": "14:26:31",
+        "exhibit": "ShipFront"
+      },
+      {
+        "startTime": "14:26:49",
+        "endTime": "14:27:45",
+        "exhibit": "ShipEntrance"
+      }
+    ],
+    "presentations": [
+      {
+        "startTime": "14:07:37",
+        "endTime": "14:09:16",
+        "exhibit": "JerusalemPhoto",
+        "ended": "System"
+      },
+      {
+        "startTime": "14:09:29",
+        "endTime": "14:10:28",
+        "exhibit": "JerusalemPhoto",
+        "ended": "System"
+      },
+      {
+        "startTime": "14:10:55",
+        "endTime": "14:11:59",
+        "exhibit": "MaterialCultures",
+        "ended": "System"
+      },
+      {
+        "startTime": "14:12:23",
+        "endTime": "14:13:46",
+        "exhibit": "BuildingMethodsAndFacilities",
+        "ended": "System"
+      },
+      {
+        "startTime": "14:14:16",
+        "endTime": "14:15:10",
+        "exhibit": "EverydayPottery",
+        "ended": "System"
+      },
+      {
+        "startTime": "14:15:21",
+        "endTime": "14:16:05",
+        "exhibit": "PhoenicianWriting1",
+        "ended": "System"
+      },
+      {
+        "startTime": "14:17:05",
+        "endTime": "14:18:04",
+        "exhibit": "BuildingMethodsAndFacilities",
+        "ended": "System"
+      },
+      {
+        "startTime": "14:18:13",
+        "endTime": "14:19:29",
+        "exhibit": "EverydayPottery",
+        "ended": "System"
+      },
+      {
+        "startTime": "14:19:57",
+        "endTime": "14:20:58",
+        "exhibit": "MaritimeCommerce",
+        "ended": "System"
+      },
+      {
+        "startTime": "14:22:49",
+        "endTime": "14:24:03",
+        "exhibit": "BronzeTools",
+        "ended": "System"
+      },
+      {
+        "startTime": "14:26:49",
+        "endTime": "14:27:45",
+        "exhibit": "ShipEntrance",
+        "ended": "User"
+      }
+    ]
+  },
+  {
     "visitorID": "202",
     "groupID": "149",
     "positions": [
