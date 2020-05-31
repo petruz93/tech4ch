@@ -32,6 +32,7 @@ const getAllVisitorsAndMap = async (req, res, next) => {
   }
 };
 
+
 router.get('/visitors/test', getVisitor);
 router.get('/visitors/all', getAllVisitors);
 router.get('/alldata', getAllVisitorsAndMap);

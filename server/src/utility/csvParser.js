@@ -1,5 +1,6 @@
 const fs = require('fs');
 const csv = require('csvtojson');
+const Visitor = require('../models/visitor');
 
 function visitorEvents(csvLines) {
   const flags = [];
@@ -59,21 +60,24 @@ async function readAllVisitorsFromDir(dirname) {
     const filenames = await readdirAsync(dirname);
     const fullFilenames = filenames.map((file) => dirname + file);
     const files = await Promise.all(fullFilenames.map(csv2visitor));
-    const jsonVisitors = [];
+    const visitors = [];
     for (let i = 0; i < files.length; i++) {
-      jsonVisitors.push({
-        visitorID: filenames[i].slice(8, 11),
-        groupID: filenames[i].slice(12, 15),
-        startVisit: files[i].positions[0].startTime,
-        endVisit: files[i].positions[files[i].positions.length - 1].endTime,
-        positions: files[i].positions,
-        presentations: files[i].presentations
-      });
+      const v = new Visitor();
+      v.visitorID = filenames[i].slice(8, 11);
+      v.groupID = filenames[i].slice(12, 15);
+      v.startVisit = files[i].positions[0].startTime;
+      v.endVisit = files[i].positions[files[i].positions.length - 1].endTime;
+      v.positions = files[i].positions;
+      v.presentations = files[i].presentations;
+      visitors.push(v);
     }
-    return jsonVisitors;
+    return visitors;
   } catch (err) {
     throw new Error(err.message);
   }
 }
 
-module.exports = { csv2json, csv2visitor, readAllVisitorsFromDir };
+
+module.exports = {
+  csv2json, csv2visitor, readAllVisitorsFromDir
+};

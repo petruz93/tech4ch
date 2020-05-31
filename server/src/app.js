@@ -2,6 +2,7 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const cors = require('cors');
 const morgan = require('morgan');
+const db = require('./utility/dbConf');
 const visitController = require('./controllers/visitController');
 const visitorController = require('./controllers/visitorController');
 const poiController = require('./controllers/pointOfInterestController');
@@ -12,6 +13,9 @@ app.use(morgan('dev'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cors());
+
+/* set up moongoose connection */
+db.initDb();
 
 app.get('/', (req, res) => {
   res.send({ message: 'hello world!' });
