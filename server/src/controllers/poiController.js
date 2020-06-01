@@ -1,14 +1,12 @@
 const express = require('express');
-// const path = require('path');
-// const fs = require('fs');
-// const xml2js = require('xml2js');
-const mapData = require('../files/map-data');
+const poiService = require('../services/poiService');
 
 const router = express.Router();
 
-const getMapData = (req, res) => {
-  res.json(mapData);
-};
+async function getPointOfInterests(req, res) {
+  const pois = await poiService.findAllPointOfInterests();
+  res.json(pois);
+}
 
 // const getMapDataJson = (req, res) => {
 //   const filepath = path.join(__dirname, '../files/map-data.json');
@@ -45,6 +43,6 @@ const getMapData = (req, res) => {
 //   });
 // };
 
-router.get('/map', getMapData);
+router.get('/map', getPointOfInterests);
 
 module.exports = router;
