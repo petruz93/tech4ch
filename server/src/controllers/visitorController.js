@@ -2,7 +2,7 @@ const express = require('express');
 // const path = require('path');
 // const parser = require('../utility/csvParser');
 // const mapData = require('../files/map-data');
-const Visitor = require('../models/visitor');
+const visitorService = require('../services/visitorService');
 
 const router = express.Router();
 
@@ -23,24 +23,13 @@ const router = express.Router();
 //   }
 // };
 
-async function findAllVisitors() {
-  const query = Visitor.find({}, '-__v');
-  const visitors = await query.exec();
-  return visitors;
-}
-
 async function getAllVisitors(req, res) {
-  const visitors = await findAllVisitors();
+  const visitors = await visitorService.findAllVisitors();
   res.json(visitors);
 }
 
-// const getAllVisitorsAndMap = async (req, res, next) => {
-//   const q1 = Visitor.find();
-// };
-
 
 // router.get('/visitors/test', getVisitor);
-router.get('/visitors/all', getAllVisitors);
-// router.get('/alldata', getAllData);
+router.get('/visitors', getAllVisitors);
 
 module.exports = router;

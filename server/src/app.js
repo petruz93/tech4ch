@@ -5,7 +5,8 @@ const morgan = require('morgan');
 const db = require('./utility/dbConf');
 const visitController = require('./controllers/visitController');
 const visitorController = require('./controllers/visitorController');
-const poiController = require('./controllers/pointOfInterestController');
+const poiController = require('./controllers/poiController');
+const allDataController = require('./controllers/allDataController');
 const errorHandler = require('./controllers/errorHandler');
 
 const app = express();
@@ -14,16 +15,17 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cors());
 
-/* set up moongoose connection */
+// set moongoose connection
 db.initDb();
 
+// set middlewares
 app.get('/', (req, res) => {
   res.send({ message: 'hello world!' });
 });
-
-app.use(visitController);
 app.use(visitorController);
 app.use(poiController);
+app.use(allDataController);
+app.use(visitController);
 app.use(errorHandler);
 
 app.listen(process.env.PORT || 3000, () => {
