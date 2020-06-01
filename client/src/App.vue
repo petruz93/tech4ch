@@ -48,7 +48,7 @@
 
 .sidenav p {
   text-decoration: none;
-  font-size: 25px;
+  font-size: 20px;
   /*color: #818181;*/
   color: #f8b739;
   display: block;
