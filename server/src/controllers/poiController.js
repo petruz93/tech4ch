@@ -1,8 +1,4 @@
 const express = require('express');
-// const path = require('path');
-// const fs = require('fs');
-// const xml2js = require('xml2js');
-// const mapData = require('../files/map-data');
 const poiService = require('../services/poiService');
 
 const router = express.Router();
