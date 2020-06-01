@@ -1,9 +1,9 @@
 const mongoose = require('mongoose');
 const path = require('path');
 const parser = require('./csvParser');
+const mapData = require('../files/map-data');
 const Poi = require('../models/pointOfInterest');
 const Visitor = require('../models/visitor');
-const mapData = require('../files/map-data');
 
 const mongo = {
   host: 'localhost',
@@ -17,19 +17,19 @@ async function saveVisitors() {
   const dirpath = path.join(__dirname, '../files/visitors-log/');
   try {
     const visitorsData = await parser.readAllVisitorsFromDir(dirpath);
-    Visitor.create(visitorsData);
+    await Visitor.create(visitorsData);
   } catch (err) {
     console.error(err);
   }
 }
 
-function savePois() {
+async function savePois() {
   const pois = [];
   mapData.forEach((p) => {
     const newPoi = new Poi(p);
     pois.push(newPoi);
   });
-  Poi.create(pois);
+  await Poi.create(pois);
 }
 
 exports.initDb = async () => {
@@ -39,11 +39,10 @@ exports.initDb = async () => {
       useUnifiedTopology: true,
       useFindAndModify: false
     });
-
     const collections = await mongoose.connection.db.listCollections().toArray();
     if (!collections.length) {
       await saveVisitors();
-      savePois();
+      await savePois();
       console.log('Database populated');
     }
     console.log('MongoDB connection ESTABLISHED on', mongo.address);

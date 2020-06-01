@@ -23,14 +23,16 @@ const router = express.Router();
 //   }
 // };
 
-const getAllVisitors = async (req, res, next) => {
-  const query = Visitor.find({}, '-_id -__v');
-  query.exec((err, visitors) => {
-    if (err) next(err);
-    // return visitors;
-    res.json(visitors);
-  });
-};
+async function findAllVisitors() {
+  const query = Visitor.find({}, '-__v');
+  const visitors = await query.exec();
+  return visitors;
+}
+
+async function getAllVisitors(req, res) {
+  const visitors = await findAllVisitors();
+  res.json(visitors);
+}
 
 // const getAllVisitorsAndMap = async (req, res, next) => {
 //   const q1 = Visitor.find();
@@ -39,6 +41,6 @@ const getAllVisitors = async (req, res, next) => {
 
 // router.get('/visitors/test', getVisitor);
 router.get('/visitors/all', getAllVisitors);
-// router.get('/alldata', getAllVisitorsAndMap);
+// router.get('/alldata', getAllData);
 
 module.exports = router;

@@ -19,14 +19,16 @@ function pois2map(pois) {
   return result;
 }
 
-const getMapData = (req, res, next) => {
+async function findAllPointOfInterests() {
   const query = Poi.find({}, '-_id -__v');
-  query.exec((err, pois) => {
-    if (err) next(err);
-    res.json(pois2map(pois));
-    // return pois2map(pois);
-  });
-};
+  const pois = await query.exec();
+  return pois2map(pois);
+}
+
+async function getPointOfInterests(req, res) {
+  const pois = await findAllPointOfInterests();
+  res.json(pois);
+}
 
 // const getMapDataJson = (req, res) => {
 //   const filepath = path.join(__dirname, '../files/map-data.json');
@@ -63,6 +65,6 @@ const getMapData = (req, res, next) => {
 //   });
 // };
 
-router.get('/map', getMapData);
+router.get('/map', getPointOfInterests);
 
 module.exports = router;
