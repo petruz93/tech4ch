@@ -19,6 +19,11 @@ export default {
       required: true,
       type: Array,
       default: () => []
+    },
+    barChartLabels: {
+      required: false,
+      type: Array,
+      default: () => []
     }
   },
   data () {
@@ -48,7 +53,7 @@ export default {
       const x = d3.scaleBand()
         .domain(d3.range(this.barChartDataLength))
         .range([this.margin.left, this.width - this.margin.right])
-        .padding(0.1)
+        .padding(0.2)
 
       const y = d3.scaleLinear()
         .domain([0, d3.max(this.barChartData)]).nice()
@@ -66,11 +71,11 @@ export default {
 
       const xAxis = g => g
         .attr('transform', `translate(0,${this.height - this.margin.bottom})`)
-        .call(d3.axisBottom(x).ticks(i => i).tickSizeOuter(0))
+        .call(d3.axisBottom(x).ticks(i => i).tickFormat(i => this.barChartLabels[i]).tickSizeOuter(0))
 
       const yAxis = g => g
         .attr('transform', `translate(${this.margin.left},0)`)
-        .call(d3.axisLeft(y).ticks(d3.max(this.barChartData)))
+        .call(d3.axisLeft(y).ticks(d3.max(this.barChartData) / 4))
         // .call(g => g.select('.domain').remove())
         .call(g => g.append('text')
           .attr('x', -this.margin.left)
@@ -84,7 +89,6 @@ export default {
 
       svg.append('g')
         .call(yAxis)
-      console.log(this.barChartData)
       return svg.node()
     }
   }

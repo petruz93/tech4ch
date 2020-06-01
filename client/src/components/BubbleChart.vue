@@ -5,11 +5,11 @@
     {{ renderChart }}
     <p align='center'>
       <svg
-        :width="width"
-        :height="height"
-        :style="{
+        :width='width'
+        :height='height'
+        :style='{
           backgroundImage: `url(${museumMap})`
-        }"
+        }'
       >
       </svg>
     </p>
@@ -23,16 +23,6 @@ import museumMap from '@/assets/museum_clean_map.jpg'
 export default {
   name: 'BubbleChart',
   props: {
-    exhibitDataProp: {
-      type: Array[Object],
-      required: false,
-      default: () => [{}]
-    },
-    visitorDataProp: {
-      type: Array[Object],
-      required: false,
-      default: () => [{}]
-    },
     bubbleChartData: {
       type: Array[Object],
       required: true,
@@ -42,14 +32,18 @@ export default {
       type: Array,
       required: true,
       default: () => []
+    },
+    bubbleChartLabels: {
+      type: Array,
+      required: true,
+      default: () => [{}]
     }
   },
   data () {
     return {
-      // dataSet,
-      msg: 'Here is the BubbleChart',
-      width: 1149,
-      height: 560,
+      width: 500 - this.margin.left - this.margin.right,
+      height: 420 - this.margin.top - this.margin.bottom,
+      margin: { top: 10, right: 20, bottom: 30, left: 50 },
       museumMap
     }
   },
@@ -63,73 +57,53 @@ export default {
   },
   computed: {
     renderChart () {
-      const radius = d3.scaleSqrt(
-        [0, d3.quantile([...this.bubbleChartData.values()].sort(d3.ascending), 0.985)],
-        [0, 15]
-      )
-
-      // const path = d3.geoPath();
-
-      // const us = FileAttachment("counties-albers-10m.json").json();
-
-      const svg = d3.create('svg').attr('viewBox', [0, 0, 975, 610])
-
-      // svg
-      //   .append("path")
-      //   .datum(topojson.feature(us, us.objects.nation))
-      //   .attr("fill", "#ccc")
-      //   .attr("d", path);
-
-      // svg
-      //   .append("path")
-      //   .datum(topojson.mesh(us, us.objects.states, (a, b) => a !== b))
-      //   .attr("fill", "none")
-      //   .attr("stroke", "white")
-      //   .attr("stroke-linejoin", "round")
-      //   .attr("d", path);
-
-      const legend = svg
+      // append the svg object to the body of the page
+      var svg = d3
+        .select('svg')
+        .attr('width', this.width + this.margin.left + this.margin.right)
+        .attr('height', this.height + this.margin.top + this.margin.bottom)
         .append('g')
-        .attr('fill', '#777')
-        .attr('transform', 'translate(925,608)')
-        .attr('text-anchor', 'middle')
-        .style('font', '10px sans-serif')
-        .selectAll('g')
-        .data([1e6, 5e6, 1e7])
-        .join('g')
+        .attr('transform',
+          'translate(' + this.margin.left + ',' + this.margin.top + ')')
 
-      legend
-        .append('circle')
-        .attr('fill', 'none')
-        .attr('stroke', '#ccc')
-        .attr('cy', d => -radius(d))
-        .attr('r', radius)
+      // Add X axis
+      var x = d3.scaleLinear()
+        .domain([0, 10000])
+        .range([0, this.width])
+      svg.append('g')
+        .attr('transform', 'translate(0,' + this.height + ')')
+        .call(d3.axisBottom(x))
 
-      legend
-        .append('text')
-        .attr('y', d => -2 * radius(d))
-        .attr('dy', '1.3em')
-        .text(d3.format('.1s'))
+      // Add Y axis
+      var y = d3.scaleLinear()
+        .domain([35, 90])
+        .range([this.height, 0])
+      svg.append('g')
+        .call(d3.axisLeft(y))
 
-      svg
-        .append('g')
-        .attr('fill', 'brown')
-        .attr('fill-opacity', 0.5)
-        .attr('stroke', '#fff')
-        .attr('stroke-width', 0.5)
-        .selectAll('circle')
+      // Add a scale for bubble size
+      var z = d3.scaleLinear()
+        .domain([200000, 1310000000])
+        .range([1, 40])
+
+      // Add dots
+      svg.append('g')
+        .selectAll('dot')
         .data(this.bubbleChartData)
-        .join('circle')
-        .attr('transform', d => `translate(${this.bubbleChartCoordinates.x},${this.bubbleChartCoordinates.y})`)
-        .attr('r', d => radius(d.value))
-        .append('title')
-        .text(
-          d => `${d.properties.name}`
-        )
+        .enter()
+        .append('circle')
+        .attr('cx', function (d) { return x(d) })
+        .attr('cy', function (d) { return y(d) })
+        .attr('r', function (d) { return z(d) })
+        .style('fill', '#69b3a2')
+        .style('opacity', '0.7')
+        .attr('stroke', 'black')
+
       return svg.node()
     }
   }
 }
+
 </script>
 
 <style scoped>

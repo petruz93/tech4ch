@@ -3,7 +3,7 @@
     <h1>Visits Per Hour Charts</h1>
     <p class ='error' v-if='visitsPerHourData===[]'> visitsPerHour props is empty! </p>
       <BarChart
-        :barChartData=this.visitsPerHourData
+        :barChartData=this.visitsPerHour
       />
       <h1>Visits Per Room Per Hour Charts</h1>
       <SNHBarChart
@@ -17,7 +17,7 @@
 // import moment from 'moment'
 // import axios from 'axios'
 import * as d3 from 'd3'
-import GroupService from '@/GroupService'
+import FetchDataUtils from '@/FetchDataUtils'
 
 export default {
   name: 'VisitorsPerHour',
@@ -30,66 +30,45 @@ export default {
       exhibitData: [],
       visitData: [],
       visitsPerHourData: [],
-      visitsPerRoomPerHour: [],
+      visitsPerRoomPerHourData: [],
       repository: ''
     }
   },
   async created () {
     console.log('App loaded')
     this.fetchData()
-    // this.getIssues()
-
-    // Get data from the backend
-    try {
-      const data = await GroupService.getVisitGroup()
-      const PoICoordinates = {}
-      for (const PoI of data.mapData) {
-        PoICoordinates[PoI.name] = [PoI.x, PoI.y]
-      }
-      this.mapData = PoICoordinates
-      this.visitorsData = data.visitorsData
-      this.groupList = this.visitorsData.map(visitorData => visitorData.groupID)
-      // Cut group duplicates
-      this.groupList = this.groupList.filter((groupElement, groupIndex) => this.groupList.indexOf(groupElement) === groupIndex)
-    } catch (error) {
-      this.error = error.message
-    }
   },
   methods: {
     async fetchData () {
-      const exhibitDataTemp = await d3.json('./map-data.json')
-      this.exhibitData = exhibitDataTemp
-      const visitDataTemp = await d3.json('./visitorsTest.json')
-      this.visitData = visitDataTemp
-      this.visitsPerHourData = this.visitsPerHour
-      this.visitsPerRoomPerHour = this.visitsPerHour
+    //   const exhibitDataTemp = await d3.json('./map-data.json')
+    //   this.exhibitData = exhibitDataTemp
+    //   const visitDataTemp = await d3.json('./visitorsTest.json')
+    //   this.visitData = visitDataTemp
+    //   this.visitsPerHourData = this.visitsPerHour
+    //   this.visitsPerRoomPerHour = this.visitsPerHour
+      // Get data from the backend
+      try {
+        const allData = await FetchDataUtils.getAllData()
+        const PoICoordinates = {}
+        for (const poi of allData.mapData) {
+          PoICoordinates[poi.name] = {
+            x: poi.x,
+            y: poi.y,
+            room: poi.room
+          }
+        }
+        this.exhibitData = PoICoordinates
+        const visitDataTemp = await allData.visitorsData
+        this.visitData = visitDataTemp
+        this.groupList = this.visitorsData.map(visitorData => visitorData.groupID)
+        // Cut group duplicates
+        this.groupList = this.groupList.filter((groupElement, groupIndex) => this.groupList.indexOf(groupElement) === groupIndex)
+      } catch (error) {
+        this.error = error.message
+      }
     }
   },
   computed: {
-    // Indexes exhibits by room
-    roomToExhibit () {
-      const roomToExhibit = d3
-        .nest()
-        .key(d => d.room)
-        .entries(this.exhibitData)
-      return roomToExhibit
-    },
-    // Displays and sorts rooms by their number
-    allRooms () {
-      const allRooms = this.roomToExhibit
-        .map(exhibit => Number(exhibit.key))
-      return allRooms.sort(function (a, b) {
-        return a - b
-      })
-    },
-    // Indexes exhibits by name
-    exhibitToRoom () {
-      const exhibitToRoom = d3
-        .nest()
-        .key(d => d.name)
-        .entries(this.exhibitData)
-      return exhibitToRoom
-    },
     // Given the visits array, outputs an array of 24 elements representing
     // the number of visits for a given hour
     visitsPerHour () {
@@ -97,9 +76,9 @@ export default {
       const visitsPerHour = []
       // console.log(_.get(this.visitDataProp, 'positions'))
       while (i < 24) {
-        const visitorPerHourTemp = this.data
+        const visitsPerHourTemp = this.visitData
           .filter(visit => Number(visit.positions[0].startTime.split(':')[0]) === i)
-        visitsPerHour[i] = visitorPerHourTemp
+        visitsPerHour[i] = visitsPerHourTemp
         i++
       }
       return visitsPerHour.map(vph => vph.length)
@@ -122,20 +101,24 @@ export default {
         .key(d => d.positions.exhibit)
         .entries(this.visitData)
       return exhibitToVisit
+    },
+    visitsPerRoomPerHour () {
+      let i = 0
+      const visitsPerHour = []
+      const visitsPerRoomPerHourArray = []
+      // console.log(_.get(this.visitDataProp, 'positions'))
+      while (i < 24) {
+        const visitsPerHourTemp = this.visitData
+          .filter(visit => Number(visit.positions[0].startTime.split(':')[0]) === i)
+        visitsPerHour[i] = visitsPerHourTemp
+        const visitsPerRoomPerHour = {}
+        visitsPerRoomPerHour.room = visitsPerHourTemp.room
+        visitsPerRoomPerHour.visits = visitsPerHourTemp.length
+        visitsPerRoomPerHourArray.push(visitsPerRoomPerHour)
+        i++
+      }
+      return visitsPerRoomPerHourArray
     }
-    // }
-    // visitsPerRoomPerHour () {
-    //   let i = 0
-    //   const visitsPerHour = []
-    //   // console.log(_.get(this.visitDataProp, 'positions'))
-    //   while (i < 24) {
-    //     const visitorPerHourTemp = this.visitData
-    //       .filter(visit => Number(visit.positions[0].startTime.split(':')[0]) === i)
-    //     visitsPerHour[i] = { 'key': visitorPerHourTemp.room, visitorPerHourTemp}
-    //     i++
-    //   }
-    //   return visitsPerHour.map(vph => vph.length)
-    // }
   }
 }
 

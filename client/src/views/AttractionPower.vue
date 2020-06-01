@@ -2,10 +2,14 @@
   <div>
     <BubbleChart
       v-if="!undefined"
-      :exhibitDataProp=exhibitData
-      :visitorDataProp=loadVisitorData
-      :bubbleChartData=attractionPowers
-      :bubbleChartCoordinates=pointOfInterests
+      :bubbleChartData=attractionPowerValues
+      :bubbleChartCoordinates=PoICoordinates
+      :bubbleChartLabels=attractionPowerKeys
+      />
+      <BarChart
+        v-if="!undefined"
+        :barChartData=attractionPowerValues
+        :barChartLabels=attractionPowerKeys
       />
 <!-- allData="loadAllData" -->
   </div>
@@ -13,21 +17,20 @@
 
 <script>
 // @ is an alias to /src
-import BubbleChart from '@/components/BubbleChart.vue'
-import UploadUtils from '@/UploadUtils.js'
-import * as d3 from 'd3'
+import FetchDataUtils from '@/FetchDataUtils'
 
 export default {
   name: 'AttractionPower',
   components: {
-    BubbleChart
+    BubbleChart: () => import('@/components/BubbleChart.vue'),
+    BarChart: () => import('@/components/BarChart.vue')
   },
   data () {
     return {
-      // loadAllData: []
       loadExhibitData: [],
       loadVisitorData: [],
-      exhibitData: []
+      exhibitData: [],
+      visitData: []
     }
   },
   created () {
@@ -35,63 +38,102 @@ export default {
     this.fetchData()
   },
   methods: {
-    async fetchAllData () {
+    async fetchData () {
       try {
-        const allData = await d3.json(UploadUtils.getAllData())
-        this.loadAllData = allData
-      } catch (err) {
-        this.err = err.message
+        const allData = await FetchDataUtils.getAllData()
+        const PoICoordinates = {}
+        for (const poi of allData.mapData) {
+          PoICoordinates[poi.name] = {
+            x: poi.x,
+            y: poi.y,
+            room: poi.room
+          }
+        }
+        this.exhibitData = PoICoordinates
+        const visitDataTemp = await allData.visitorsData
+        this.visitData = visitDataTemp
+        this.groupList = this.visitorsData.map(visitorData => visitorData.groupID)
+        // Cut group duplicates
+        this.groupList = this.groupList.filter((groupElement, groupIndex) => this.groupList.indexOf(groupElement) === groupIndex)
+      } catch (error) {
+        this.error = error.message
       }
     },
-    async fetchData () {
-      const exhibitDataTemp = await d3.json('./map-data.json')
-      this.loadExhibitData = exhibitDataTemp
-      this.exhibitData = this.prepareExhibitData
-      const visitorDataTemp = await d3.json('./visitorsTest.json')
-      this.loadVisitorData = visitorDataTemp
+    countVisitExhibitOccurrences (positionArray) {
+      const result = {}
+      if (positionArray instanceof Array) { // Check if input is array.
+        positionArray.forEach(function (v) {
+          // const startTime = v.startTime
+          // const endTime = v.endTime
+          // console.log((parseInt(v.endTime.split(':')[2]) - parseInt(v.startTime.split(':')[2])) +
+          //   (parseInt(v.endTime.split(':')[1]) * 60 - parseInt(v.startTime.split(':')[1]) * 60) +
+          //   (parseInt(v.endTime.split(':')[0]) * 3600 - parseInt(v.startTime.split(':')[0]) * 3600))
+          const timeSpent = (parseInt(v.endTime.split(':')[2]) - parseInt(v.startTime.split(':')[2])) + 
+            (parseInt(v.endTime.split(':')[1]) * 60 - parseInt(v.startTime.split(':')[1]) * 60) +
+            (parseInt(v.endTime.split(':')[0]) * 3600 - parseInt(v.startTime.split(':')[0]) * 3600)
+          if (!result[v.exhibit]) {
+            result[v.exhibit] = timeSpent
+          } else {
+            result[v.exhibit] = result[v.exhibit] + timeSpent
+          }
+        })
+      }
+      return result
+    },
+    countExhibitOccurrences (exhibitArray) {
+      'use strict'
+      const result = {}
+      if (exhibitArray instanceof Array) { // Check if input is array.
+        exhibitArray.forEach(function (v, i) {
+          for (const e in v) {
+            if (!result[e]) { // Initial object property creation.
+              result[e] = 1 // Create an array for that property.
+            } else { // Same occurrences found.
+              result[e] = result[e] + 1 // Fill the array.
+            }
+          }
+        })
+        return result
+      }
     }
+    // async fetchData () {
+    //   const exhibitDataTemp = await d3.json('./map-data.json')
+    //   this.loadExhibitData = exhibitDataTemp
+    //   this.exhibitData = this.prepareExhibitData
+    //   const visitorDataTemp = await d3.json('./visitorsTest.json')
+    //   this.loadVisitorData = visitorDataTemp
+    // }
   },
   computed: {
-    prepareVisitorData () {
-      const visitorDataSet = d3
-        .entries(this.visitorDataProp)
-      const allVisitors = { id: 'visitorData', values: visitorDataSet }
-      return allVisitors
-    },
-    prepareExhibitData () {
-      const exhibitDataSet = d3
-        .entries(this.exhibitDataProp)
-      const allExihibits = { id: 'exhibitData', values: exhibitDataSet }
-      return allExihibits
-    },
-    scaleRadius () {
-      const r = d3
-        .scaleLinear()
-        .domain([0, Math.max(...this.calculateAttractionPower())])
-        .range([0, 100])
-      console.log('r', r)
-      return r
-    },
-    pointOfInterests () {
-      return this.exhibitData.map(d =>
-        [d.x, d.y])
-    },
-    exhibitToVisits () {
-      const visits = this.visitorData
-        .map(v =>
-          v.positions.map(p =>
-            p.exhibit)
-            .reduce((count, exhibit) =>
-              count + exhibit
-            ))
-      console.log('visits:', visits)
+    exhibitVisits () {
+      const visits = this.visitData
+        .map(v => this.countVisitExhibitOccurrences(v.positions))
       return visits
     },
-    attractionPowers () {
-      const visitorDataLength = this.visitorData.length
-      console.log('attractionPower', this.exhibitData.map(e => this.exhibitVisits.map(ev => ev / visitorDataLength)))
-      return this.exhibitData.map(e => this.exhibitVisits.map(ev => ev / visitorDataLength))
+    totalExhibitVisits () {
+      return this.countExhibitOccurrences(this.exhibitVisits)
+    },
+    attractionPower () {
+      const totalVisits = this.exhibitVisits.length
+      const attractionPowers = {}
+      for (const e in this.totalExhibitVisits) {
+        attractionPowers[e] = this.totalExhibitVisits[e] / totalVisits
+      }
+      return attractionPowers
+    },
+    attractionPowerValues () {
+      return Object.values(this.attractionPower)
+    },
+    attractionPowerKeys () {
+      return Object.keys(this.attractionPower)
     }
+    // holdingPower () {
+    //   this.visitData.forEach(function (v) {
+    //     positionArray.forEach()
+    //     position.endTime.split(':')[2] - position.startTime.split(':')[2] +
+    //     position.endTime.split(':')[1]*60 - position.startTime.split(':')[1]*60 +
+    //     position.endTime.split(':')[0]*3600 - position.startTime.split(':')[0]*3600
+    //   })
   }
 }
 

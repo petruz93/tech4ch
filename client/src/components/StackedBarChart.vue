@@ -22,7 +22,7 @@ export default {
   },
   data () {
     return {
-      chart: null,
+      // chart: null,
       width: 900,
       height: 500,
       margin: ({ top: 10, right: 0, bottom: 30, left: 30 })
@@ -31,11 +31,9 @@ export default {
   computed: {
     colors () {
       const colors = d3.scaleOrdinal(
-      data.categories,
-      d3.schemeGnBu[9].slice(3))
-    },
-    height () {
-      return this.stackedBarChartData.length * 25 + this.margin.top + this.margin.bottom
+        this.stackedBarChartData.categories,
+        d3.schemeGnBu[9].slice(3))
+      return colors
     },
     renderChart () {
       const svg = d3.create('svg')
@@ -101,46 +99,43 @@ export default {
 
       return svg.node()
     },
-  chart() {
+    chart () {
+      const svg = d3.create('svg')
+        .attr('width', 900)
+        .attr('height', 500)
 
-  const svg = d3.create('svg')
-      .attr('width', 900)
-      .attr('height', 500)
+      // Pass our data to the stack to generate the layer positions
+      // const chartData = stack(stackedBarChartData)
+      const groups = svg.append('g')
+        // Each layer of the stack goes in a group
+        // the group contains that layer for all countries
+        .selectAll('g')
+        .data(this.stackedChartData)
+        .join('g')
+        // rects in the same layer will all have the same color, so we can put it on the group
+        // we can use the key on the layer's array to set the color
+        .style('fill', (d, i) => this.colors(d.key))
 
-  // Pass our data to the stack to generate the layer positions
-  const chartData = stack( data ) 
-  
-  const groups = svg.append('g')
-    // Each layer of the stack goes in a group
-    // the group contains that layer for all countries
-    .selectAll('g')
-    .data( chartData )
-    .join('g')
-      // rects in the same layer will all have the same color, so we can put it on the group
-      // we can use the key on the layer's array to set the color
-      .style('fill', (d,i) => colors(d.key))
-  
-  groups.selectAll('rect')
-    // Now we place the rects, which are the children of the layer array
-    .data(d => d)
-    .join('rect')
-      .attr('x', d => xScale(d.data.location))
-      .attr('y', d => yScale(d[1]))
-      .attr('height', d => yScale(d[0]) - yScale(d[1]))
-      .attr('width', xScale.bandwidth())
+      groups.selectAll('rect')
+      // Now we place the rects, which are the children of the layer array
+        .data(d => d)
+        .join('rect')
+        .attr('x', d => this.xAxis(d.data.location))
+        .attr('y', d => this.yAxis(d[1]))
+        .attr('height', d => this.yAxis(d[0]) - this.yAxis(d[1]))
+        .attr('width', this.xAxis.bandwidth())
 
-  svg.append('g')
-    .attr('transform', `translate(0,${ height - margin.bottom })`)
-    .call(xAxis)
-  
-  svg.append('g')
-    .attr('transform', `translate(${ margin.left },0)`)
-    .call(yAxis)
-    .select('.domain').remove()
+      svg.append('g')
+        .attr('transform', `translate(0,${this.height - this.margin.bottom})`)
+        .call(this.xAxis)
 
-  return svg.node()
-  
-}
+      svg.append('g')
+        .attr('transform', `translate(${this.margin.left},0)`)
+        .call(this.yAxis)
+        .select('.domain').remove()
+
+      return svg.node()
+    }
   }
 }
 </script>
