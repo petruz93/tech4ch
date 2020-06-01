@@ -36,6 +36,7 @@ export default {
         PoICoordinates[PoI.name] = [PoI.x, PoI.y]
       }
       this.mapData = PoICoordinates
+      // this.mapData = data.mapData
       this.visitorsData = data.visitorsData
       this.groupList = this.visitorsData.map(visitorData => visitorData.groupID)
       // Cut group duplicates
@@ -75,6 +76,8 @@ export default {
             visitorPosition.startTime,
             this.mapData[exhibit][0],
             this.mapData[exhibit][1],
+            // this.mapData[exhibit].x,
+            // this.mapData[exhibit].y,
             selectedVisitorsList[visitorPositionsIndex],
             exhibit
           ]
