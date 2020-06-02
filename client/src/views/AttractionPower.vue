@@ -1,17 +1,34 @@
 <template>
   <div>
-    <BubbleChart
-      v-if="!undefined"
-      :bubbleChartData=attractionPowerValues
-      :bubbleChartCoordinates=PoICoordinates
-      :bubbleChartLabels=attractionPowerKeys
-      />
-      <BarChart
-        v-if="!undefined"
-        :barChartData=attractionPowerValues
-        :barChartLabels=attractionPowerKeys
-      />
-<!-- allData="loadAllData" -->
+    <div class="bubbleChart">
+      <span>Click on the button to change between Attraction and Holding Powers!</span><br><br>
+      <button
+        v-if="attractionPowerOn"
+        @click=changeStat
+        class='button-css'>
+        View Holding Power
+      </button>
+      <h1><p align="center" v-if="attractionPowerOn">Attraction Power</p></h1>
+      <BubbleChart
+        v-if="!undefined && attractionPowerOn"
+        :bubbleChartData=attractionPowerValues
+        :bubbleChartCoordinates=poiCoordinates
+        :bubbleChartLabels=attractionPowerKeys>
+      </BubbleChart>
+      <button
+        v-if="holdingPowerOn"
+        @click=changeStat
+        class='button-css'>
+        View Attraction Power
+      </button>
+      <h1><p align="center" v-if="holdingPowerOn">Holding Power</p></h1>
+      <BubbleChart
+        v-if="!undefined && holdingPowerOn"
+        :bubbleChartData=holdingPowerValues
+        :bubbleChartCoordinates=poiCoordinates
+        :bubbleChartLabels=attractionPowerKeys>
+      </BubbleChart>
+      </div>
   </div>
 </template>
 
@@ -22,15 +39,17 @@ import FetchDataUtils from '@/FetchDataUtils'
 export default {
   name: 'AttractionPower',
   components: {
-    BubbleChart: () => import('@/components/BubbleChart.vue'),
-    BarChart: () => import('@/components/BarChart.vue')
+    BubbleChart: () => import('@/components/BubbleChart.vue')
   },
   data () {
     return {
-      loadExhibitData: [],
-      loadVisitorData: [],
       exhibitData: [],
-      visitData: []
+      visitData: [],
+      poiCoordinates: [],
+      attractionPowerValuesData: [],
+      attractionPowerKeysData: [],
+      attractionPowerOn: true,
+      holdingPowerOn: false
     }
   },
   created () {
@@ -41,34 +60,26 @@ export default {
     async fetchData () {
       try {
         const allData = await FetchDataUtils.getAllData()
-        const PoICoordinates = {}
-        for (const poi of allData.mapData) {
-          PoICoordinates[poi.name] = {
-            x: poi.x,
-            y: poi.y,
-            room: poi.room
-          }
-        }
-        this.exhibitData = PoICoordinates
+        this.exhibitData = allData.mapData
+        // set visitData
         const visitDataTemp = await allData.visitorsData
         this.visitData = visitDataTemp
-        this.groupList = this.visitorsData.map(visitorData => visitorData.groupID)
-        // Cut group duplicates
-        this.groupList = this.groupList.filter((groupElement, groupIndex) => this.groupList.indexOf(groupElement) === groupIndex)
+        // set PoI coordinates
+        Object.values(this.exhibitData)
+          .forEach(v => this.poiCoordinates.push([Number(v.x), Number(v.y)]))
       } catch (error) {
         this.error = error.message
       }
     },
+    changeStat () {
+      this.attractionPowerOn = !this.attractionPowerOn
+      this.holdingPowerOn = !this.holdingPowerOn
+    },
     countVisitExhibitOccurrences (positionArray) {
       const result = {}
-      if (positionArray instanceof Array) { // Check if input is array.
+      if (positionArray instanceof Array) {
         positionArray.forEach(function (v) {
-          // const startTime = v.startTime
-          // const endTime = v.endTime
-          // console.log((parseInt(v.endTime.split(':')[2]) - parseInt(v.startTime.split(':')[2])) +
-          //   (parseInt(v.endTime.split(':')[1]) * 60 - parseInt(v.startTime.split(':')[1]) * 60) +
-          //   (parseInt(v.endTime.split(':')[0]) * 3600 - parseInt(v.startTime.split(':')[0]) * 3600))
-          const timeSpent = (parseInt(v.endTime.split(':')[2]) - parseInt(v.startTime.split(':')[2])) + 
+          const timeSpent = (parseInt(v.endTime.split(':')[2]) - parseInt(v.startTime.split(':')[2])) +
             (parseInt(v.endTime.split(':')[1]) * 60 - parseInt(v.startTime.split(':')[1]) * 60) +
             (parseInt(v.endTime.split(':')[0]) * 3600 - parseInt(v.startTime.split(':')[0]) * 3600)
           if (!result[v.exhibit]) {
@@ -95,14 +106,23 @@ export default {
         })
         return result
       }
+    },
+    countExhibitVisitTime (exhibitArray) {
+      'use strict'
+      const result = {}
+      if (exhibitArray instanceof Array) { // Check if input is array.
+        exhibitArray.forEach(function (v, i) {
+          for (const e in v) {
+            if (!result[e]) { // Initial object p roperty creation.
+              result[e] = v[e] // Create an array for that property.
+            } else { // Same occurrences found.
+              result[e] = result[e] + v[e] // Fill the array.
+            }
+          }
+        })
+        return result
+      }
     }
-    // async fetchData () {
-    //   const exhibitDataTemp = await d3.json('./map-data.json')
-    //   this.loadExhibitData = exhibitDataTemp
-    //   this.exhibitData = this.prepareExhibitData
-    //   const visitorDataTemp = await d3.json('./visitorsTest.json')
-    //   this.loadVisitorData = visitorDataTemp
-    // }
   },
   computed: {
     exhibitVisits () {
@@ -126,14 +146,12 @@ export default {
     },
     attractionPowerKeys () {
       return Object.keys(this.attractionPower)
+    },
+    holdingPowerValues () {
+      const countExhibitVisitTime = this.countExhibitVisitTime(this.exhibitVisits)
+      const countTotalExhibitVisitTime = Object.values(countExhibitVisitTime).reduce((acc, currValue) => acc + currValue)
+      return Object.values(countExhibitVisitTime).map(v => v / countTotalExhibitVisitTime)
     }
-    // holdingPower () {
-    //   this.visitData.forEach(function (v) {
-    //     positionArray.forEach()
-    //     position.endTime.split(':')[2] - position.startTime.split(':')[2] +
-    //     position.endTime.split(':')[1]*60 - position.startTime.split(':')[1]*60 +
-    //     position.endTime.split(':')[0]*3600 - position.startTime.split(':')[0]*3600
-    //   })
   }
 }
 

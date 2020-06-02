@@ -29,7 +29,7 @@ export default {
   data () {
     return {
       chart: null,
-      color: 'steelblue',
+      color: 'green',
       height: 600,
       width: 600,
       margin: ({ top: 30, right: 0, bottom: 30, left: 40 })
@@ -47,11 +47,12 @@ export default {
     },
     renderChart () {
       const svg = d3
-        .select('svg')
+        .select('div.barChart')
+        .append('svg')
         .attr('viewBox', [0, 0, this.width, this.height])
 
       const x = d3.scaleBand()
-        .domain(d3.range(this.barChartDataLength))
+        .domain(d3.range(this.barChartLabels.length))
         .range([this.margin.left, this.width - this.margin.right])
         .padding(0.2)
 
