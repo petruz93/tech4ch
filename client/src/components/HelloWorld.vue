@@ -25,7 +25,7 @@
       <li>Playback
         <ul>
           <li>This sheet allows the user to replay a group visit. Selecting a group and pressing the play button makes possible to see how the visitors moved around the museum map via a graphical representation on the map. It’s possible to reset the visit with the reset button and to change the speed visit with the slider under said button.
-            Below the map it’s possible to see the current timestamp of the moving visitor and the name of the Point of Interest where he’s/she’s headed
+            Below the map it’s possible to see the current timestamp of the moving visitor and the name of the Point of Interest where he’s/she’s headed.
           </li>
         </ul>
       </li>
