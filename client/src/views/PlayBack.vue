@@ -49,6 +49,7 @@ export default {
         this.selectedGroup = e.target.options[e.target.options.selectedIndex].value
         this.visitorsGroupList = this.visitorsData.filter(visitorData => visitorData.groupID === this.selectedGroup)
           .map(visitorData => visitorData.visitorID)
+        this.error = ''
         this.generateVisit()
         MoveVisitorsFunctions.changeSpeed(5)
         MoveVisitorsFunctions.resetVisit(this.visitorsGroupList)
@@ -66,15 +67,20 @@ export default {
       for (const visitorPositionsIndex in visitorsPositions) {
         for (const visitorPosition of visitorsPositions[visitorPositionsIndex]) {
           const exhibit = visitorPosition.exhibit
-          // TODO: Change "visitRow" name, it's terribly ugly
-          const visitRow = [
-            visitorPosition.startTime,
-            this.mapData[exhibit].x,
-            this.mapData[exhibit].y,
-            selectedVisitorsList[visitorPositionsIndex],
-            exhibit
-          ]
-          visit = visit.concat([visitRow])
+          try {
+            // TODO: Change "visitRow" name, it's terribly ugly
+            const visitRow = [
+              visitorPosition.startTime,
+              this.mapData[exhibit].x,
+              this.mapData[exhibit].y,
+              selectedVisitorsList[visitorPositionsIndex],
+              exhibit
+            ]
+            visit = visit.concat([visitRow])
+          } catch (e) {
+            console.log(e)
+            this.error = e
+          }
         }
       }
       visit = visit.sort(function (a, b) {
