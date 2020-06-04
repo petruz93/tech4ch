@@ -8,26 +8,31 @@
         class='button-css'>
         View Holding Power
       </button>
-      <h1><p align="center" v-if="attractionPowerOn">Attraction Power</p></h1>
+      <h1 v-if="attractionPowerOn"><p align="center">
+        Attraction Power</p></h1>
       <BubbleChart
         v-if="!undefined && attractionPowerOn"
         :bubbleChartData=attractionPowerValues
         :bubbleChartCoordinates=poiCoordinates
         :bubbleChartLabels=attractionPowerKeys>
       </BubbleChart>
+      <p align="center" v-if="attractionPowerOn">Attraction Power is calculated by dividing the total times that all museum visitors passed by a relevant map coordinate by the total time visitors changed their position across all the visits. It measures how much a point of interest is relatively capable of capturing visitors interest.</p>
       <button
         v-if="holdingPowerOn"
         @click=changeStat
         class='button-css'>
         View Attraction Power
       </button>
-      <h1><p align="center" v-if="holdingPowerOn">Holding Power</p></h1>
+      <h1 v-if="holdingPowerOn"><p align="center">Holding Power</p></h1>
       <BubbleChart
         v-if="!undefined && holdingPowerOn"
         :bubbleChartData=holdingPowerValues
         :bubbleChartCoordinates=poiCoordinates
         :bubbleChartLabels=attractionPowerKeys>
       </BubbleChart>
+      <p align="center" v-if="holdingPowerOn">
+      Holding Power is calculated by dividing the total time that all museum visitors remained stationed by a relevant map coordinate by the total time visitors spent inside the museum. It measures how much a point of interest is relatively capable of holding visitors interest.
+      </p>
       </div>
   </div>
 </template>

@@ -33,7 +33,7 @@ export default {
     return {
       baseWidth: 1140,
       baseHeight: 560,
-      margin: { top: 0, right: 0, bottom: 0, left: 0 },
+      margin: { top: 0, right: 20, bottom: 40, left: 5 },
       // margin: { top: 10, right: 20, bottom: 30, left: 50 },
       museumMap,
       hover: false
@@ -55,13 +55,14 @@ export default {
       const svg = d3
         .select('.bubbleChart')
         .append('svg')
-        // .attr('width', this.width + this.width + this.margin.left + this.margin.right)
-        // .attr('height', this.height + this.margin.top + this.margin.bottom)
-        // .attr('xlink:href', this.museumMap)
+        .attr('class', 'bubbleChart')
+        .attr('width', this.width + this.margin.left + this.margin.right)
+        .attr('height', this.height + this.margin.top + this.margin.bottom)
         .attr('v:style', `background-image: url(${this.museumMap})`)
+        // .attr('xlink:href', this.museumMap)
+        .attr('viewBox', [0, 0, this.width, this.height])
         // .attr('v:style', 'background-size: contain')
         // .attr('v:style', 'background-repeat: no-repeat')
-        .attr('viewBox', [0, 0, this.width, this.height])
         .attr('preserveAspectratio', 'xMinYMin')
         .append('g')
         .attr('transform',
@@ -79,7 +80,7 @@ export default {
       // Add Y axis
       const y = d3.scaleLinear()
         .domain([0, Math.max(...this.bubbleChartCoordinates.map(v => v[1])) * 1.35])
-        .range([this.height - this.margin.bottom, this.margin.top])
+        .range([this.margin.top, this.height - this.margin.bottom])
 
       // const yAxis = g => g
       //   .attr('transform', `translate(${this.margin.left},0)`)
@@ -89,6 +90,11 @@ export default {
       const z = d3.scaleLinear()
         .domain([0, Math.max(...this.bubbleChartData)])
         .range([0, 50])
+
+      const color = d3.scaleLinear()
+        .domain([0, Math.max(...this.bubbleChartData)])
+        .interpolate(d3.interpolateHsl)
+        .range([d3.rgb('#FFFFCC'), d3.rgb('#CC0000')]) // yellow to red
 
       // Add dots
       svg.append('g')
@@ -102,7 +108,9 @@ export default {
         // .attr('@mouseover', this.hover = true)
         // .attr(':class', '{ active: hover }')
         // .attr('@mouseleave', this.hover = false)
-        .style('fill', '#69b3a2')
+        // .attr('v-if', (d, i) => `${this.bubbleChartData[i]}>500'`)
+        .style('fill', (d, i) => color(this.bubbleChartData[i]))
+        // .style('fill', 'red')
         .style('opacity', '0.7')
         .attr('stroke', 'black')
 
@@ -130,7 +138,7 @@ export default {
 
 <style scoped>
 
-div:bubbleChart {
+svg.bubbleChart {
   background-image: url(${this.museumMap});
 }
 

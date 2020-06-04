@@ -1,11 +1,10 @@
 <template>
   <div>
-    <h1>Bar Chart </h1>
-        <div class="barChart" v-if="barChartData!==[]">
-        <svg>
-          {{ this.renderChart }}
-        </svg>
-        </div>
+    <div class="barChart" v-if="barChartData!==[]">
+    <svg>
+      {{ this.renderChart }}
+    </svg>
+    </div>
   </div>
 </template>
 
@@ -28,7 +27,6 @@ export default {
   },
   data () {
     return {
-      chart: null,
       color: 'green',
       height: 600,
       width: 600,
@@ -46,9 +44,12 @@ export default {
       return this.barChartData.length
     },
     renderChart () {
+      d3.selectAll('svg').remove()
       const svg = d3
         .select('div.barChart')
         .append('svg')
+        .attr('width', this.width + this.margin.left + this.margin.right)
+        .attr('height', this.height + this.margin.top + this.margin.bottom)
         .attr('viewBox', [0, 0, this.width, this.height])
 
       const x = d3.scaleBand()
@@ -76,7 +77,7 @@ export default {
 
       const yAxis = g => g
         .attr('transform', `translate(${this.margin.left},0)`)
-        .call(d3.axisLeft(y).ticks(d3.max(this.barChartData) / 4))
+        .call(d3.axisLeft(y).ticks(d3.max(this.barChartData) / 10))
         // .call(g => g.select('.domain').remove())
         .call(g => g.append('text')
           .attr('x', -this.margin.left)
