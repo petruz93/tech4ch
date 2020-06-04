@@ -1,7 +1,8 @@
 <template>
   <div class="home">
-    <img alt="Vue logo" src="../assets/logo.png">
-    <HelloWorld msg="Welcome to Your Vue.js App"/>
+    <HelloWorld msg="Welcome to Tech4CH App"/>
+  <!-- <img src="@/assets/museum_clean_map.jpg" width=135%, height=135% /> -->
+  <!-- <BarChart :barChartData = loadDataBarChart /> -->
   </div>
 </template>
 
@@ -16,3 +17,7 @@ export default {
   }
 }
 </script>
+
+<style scoped>
+
+</style>
