@@ -1,24 +1,15 @@
+import { baseUrl } from './services/Api'
 
-import axios from 'axios'
-
-const url = 'http://localhost:3000/alldata'
-
-class GroupService {
+class FetchDataUtils {
   static async getAllData () {
     try {
-      const res = await axios.get(url)
+      const res = await baseUrl.getBaseUrl().get('alldata')
       return res.data
     } catch (error) {
       console.log(error)
       throw error
     }
   }
-
-  static async postGroup (group) {
-    return await axios.post('url', {
-      group
-    })
-  }
 }
 
-export default GroupService
+export default FetchDataUtils
