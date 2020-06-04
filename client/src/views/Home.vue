@@ -1,6 +1,6 @@
 <template>
   <div class="home">
-    <HelloWorld msg="Welcome to Tech4CH App"/>
+    <HelloWorld/>
   <!-- <img src="@/assets/museum_clean_map.jpg" width=135%, height=135% /> -->
   <!-- <BarChart :barChartData = loadDataBarChart /> -->
   </div>
