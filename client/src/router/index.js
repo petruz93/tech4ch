@@ -1,6 +1,8 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
 import Home from '../views/Home.vue'
+import AttractionPower from '../views/AttractionPower.vue'
+import VisitorsPerHour from '../views/VisitorsPerHour.vue'
 
 Vue.use(VueRouter)
 
@@ -9,6 +11,16 @@ const routes = [
     path: '/',
     name: 'Home',
     component: Home
+  },
+  {
+    path: '/visitors_per_hour',
+    name: 'VisitorsPerHour',
+    component: VisitorsPerHour
+  },
+  {
+    path: '/attr_power',
+    name: 'AttractionPower',
+    component: AttractionPower
   },
   {
     path: '/about',

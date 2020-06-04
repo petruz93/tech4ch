@@ -1,13 +1,15 @@
 <template>
   <div id="app">
+<<<<<<< HEAD
     <div class="sidenav">
       <p>Museum Project!</p>
       <br>
       <router-link to="/">Home</router-link>
       <br>
-      <router-link to="/about">About</router-link>
+      <router-link to="/visitors_per_hour">VisitorsPerHour</router-link>
       <br>
-      <!--      <a href="bg.html">click</a> |-->
+      <router-link to="/attr_power">Attraction and Holding Power</router-link>
+      <br>
       <router-link to="/playback">PlayBack</router-link>
       <br>
       <router-link to="/visitsummary">Visit Summary</router-link>
