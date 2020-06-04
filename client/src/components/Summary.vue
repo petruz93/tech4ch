@@ -98,8 +98,8 @@
           <th colspan='3'>Achievement</th>
         </tr>
         <tr>
-          <th>Stay more then average</th>
-          <th>Watched more then average presentations</th>
+          <th>Stood more than average</th>
+          <th>Watched more than average presentations</th>
           <th>Number of presentations watched entirely</th>
         </tr>
         <tr>

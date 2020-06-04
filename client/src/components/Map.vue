@@ -42,7 +42,7 @@ export default {
 }
 </script>
 
-<style>
+<style scoped>
 div.slideContainer span {
   font-size: 23px;
 }

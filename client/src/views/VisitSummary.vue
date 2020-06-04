@@ -22,7 +22,7 @@
 
 <script>
 import Summary from '@/components/Summary.vue'
-import GroupService from '../GroupService'
+import FetchDataUtils from '../FetchDataUtils'
 
 export default {
   name: 'VisitSummary',
@@ -47,7 +47,7 @@ export default {
   async created () {
     try {
       this.picked = 'group'
-      const data = await GroupService.getVisitGroup()
+      const data = await FetchDataUtils.getAllData()
       this.visitorsData = data.visitorsData
       this.groupList = this.visitorsData.map(visitorData => visitorData.groupID)
       // Cut group duplicates

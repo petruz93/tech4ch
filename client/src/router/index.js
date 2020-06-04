@@ -2,7 +2,7 @@ import Vue from 'vue'
 import VueRouter from 'vue-router'
 import Home from '../views/Home.vue'
 import AttractionPower from '../views/AttractionPower.vue'
-import VisitorsPerHour from '../views/VisitorsPerHour.vue'
+import VisitorsPerHour from '../views/VisitsPerHour.vue'
 
 Vue.use(VueRouter)
 

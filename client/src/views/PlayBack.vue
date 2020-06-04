@@ -12,7 +12,7 @@
 
 <script>
 import Map from '@/components/Map.vue'
-import GroupService from '../GroupService.js'
+import FetchDataUtils from '../FetchDataUtils'
 import { MoveVisitorsFunctions } from '../../public/moveVisitors'
 export default {
   name: 'PlayBack',
@@ -30,7 +30,7 @@ export default {
   // Get data from the backend
   async created () {
     try {
-      const data = await GroupService.getVisitGroup()
+      const data = await FetchDataUtils.getAllData()
       this.mapData = data.mapData
       this.visitorsData = data.visitorsData
       this.groupList = this.visitorsData.map(visitorData => visitorData.groupID)
