@@ -2,8 +2,11 @@
   <div class="barChart">
     <span>Click on the button to change between Visit/Hour and Visit/Room/Hour!</span><br><br>
     <button v-if="visitPerHourOn" @click=changeStat class='button-css'>Visit/Room/Hour</button>
+    <button v-if="visitPerRoomPerHourOn" @click=changeStat class='button-css'>Visit/Hour</button><br>
       <h1 v-if="visitPerHourOn"><p align="center">
         Visit Per Hour</p></h1>
+      <h1 v-if="visitPerRoomPerHourOn"><p align="center">
+        Visit Per Room Per Hour</p></h1>
       <select v-if="visitPerRoomPerHourOn" @change=visitsPerSelectedRoom class='select-css'>
         <option></option>
         <option v-for='vprph in this.roomsList' :key='vprph' v-bind:value='vprph'>{{ vprph }}</option>
@@ -13,13 +16,10 @@
         :barChartData=visitsPerHourValues
         :barChartLabels=visitsPerHourKeys
       />
-      <h1 v-if="visitPerRoomPerHourOn"><p align="center">
-        Visit Per Room Per Hour</p></h1>
       <BarChart v-if="visitPerRoomPerHourOn"
         :barChartData=visitsPerRoomPerHourValues
         :barChartLabels=visitsPerRoomPerHourKeys
       />
-      <button v-if="visitPerRoomPerHourOn" @click=changeStat class='button-css'>Visit/Hour</button><br>
       <BarChart
         :barChartData=visitsPerRoomPerHourValues
         :barChartLabels=visitsPerRoomPerHourKeys
