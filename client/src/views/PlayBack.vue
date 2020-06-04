@@ -49,7 +49,6 @@ export default {
         this.selectedGroup = e.target.options[e.target.options.selectedIndex].value
         this.visitorsGroupList = this.visitorsData.filter(visitorData => visitorData.groupID === this.selectedGroup)
           .map(visitorData => visitorData.visitorID)
-        this.error = ''
         this.generateVisit()
         MoveVisitorsFunctions.changeSpeed(5)
         MoveVisitorsFunctions.resetVisit(this.visitorsGroupList)
@@ -78,8 +77,8 @@ export default {
             ]
             visit = visit.concat([visitRow])
           } catch (e) {
-            console.log(e)
-            this.error = e
+            const errorString = e + '.\nProblem with exhibit ' + exhibit
+            console.log(errorString)
           }
         }
       }
