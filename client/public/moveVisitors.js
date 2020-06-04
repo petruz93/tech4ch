@@ -57,9 +57,10 @@ function sleep (ms) {
 
 // Prevent the overlap of the visitors in the same PoI
 function translateVisitor (customPosition, numberOfVisitorsInCustomPosition) {
+  const visitorTranslation = 10
   for (const [, visitorPosition] of Object.entries(currentVisitorsPositions)) {
     if (customPosition.top === visitorPosition.top && customPosition.left === visitorPosition.left) {
-      customPosition.left = +customPosition.left + +10
+      customPosition.left = +customPosition.left + +visitorTranslation
       return translateVisitor(customPosition, +numberOfVisitorsInCustomPosition + +1)
     }
   }
