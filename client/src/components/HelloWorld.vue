@@ -33,7 +33,7 @@
       <li>Visit Summary
         <ul>
           <li>
-            This sheet allows the user to see the summary of a group of visitors or the single visitor. It’s possible to switch between those two with the radio button on the top and the content of the dropdown menu will be updated automatically. Clicking on the View summary! button it’s possible to see the summary of the group/visitor
+            This sheet allows the user to see the visit summary about a group of visitors or the single visitor. To switch between them, the user can use the radio buttons on the top and the content of the dropdown menu will be updated automatically. By clicking on the View summary! button it’s possible to see the summary of the group/visitor. 
           </li>
         </ul>
       </li>
